@@ -1,0 +1,27 @@
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'scala'
+
+sourceCompatibility = 1.8
+
+def akkaVersion = "2.5.0"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.scala-lang:scala-library:2.12.1'
+    compile group: 'com.typesafe.akka', name: 'akka-cluster_2.12', version: akkaVersion
+}
+
+sourceSets {
+    main.scala.srcDirs = ['src/main/scala']
+    test.scala.srcDirs = ['src/test/scala']
+}
+
+tasks.withType(ScalaCompile) {
+    scalaCompileOptions.with {
+        force = true
+    }
+}
