@@ -1,13 +1,13 @@
-package org.cmsfs.collect.script
+package org.cmsfs.collect.script.local
 
-import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
+import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import com.typesafe.config.ConfigFactory
 
 import scala.util.Random
 
-class CollectScriptEnd extends Actor with ActorLogging {
+class CollectScriptLocal extends Actor with ActorLogging {
   val cluster = Cluster(context.system)
 
   val a = context.actorOf(Props[ABC],name="collect-script")
@@ -30,23 +30,14 @@ class CollectScriptEnd extends Actor with ActorLogging {
   }
 }
 
-class ABC extends Actor {
-
-  val num = new Random().nextInt(10)
-
-  override def receive: Receive = {
-    case "abc" => println(s"abc333333333333 - ${num} -   ${context.self.path}")
-  }
-}
-
-object CollectScriptEnd {
+object CollectScriptLocal {
   def main(args: Array[String]): Unit = {
     val port = args(0)
     val config = ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port)
-      .withFallback(ConfigFactory.load("collect-script"))
+      .withFallback(ConfigFactory.load("collect-script-local"))
 
     val system = ActorSystem("ClusterSystem", config)
-    val collectScript = system.actorOf(Props[CollectScriptEnd], name = "collect-script")
+    val collectScript = system.actorOf(Props[CollectScriptLocal], name = "local-script")
 
   }
 }

@@ -1,30 +1,18 @@
-package org.cmsfs.bootstrap
+package org.cmsfs.collect.script.remote
 
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 import akka.cluster.Cluster
-import akka.cluster.ClusterEvent.{MemberEvent, MemberRemoved, MemberUp, UnreachableMember}
-import akka.routing.FromConfig
+import akka.cluster.ClusterEvent._
 import com.typesafe.config.ConfigFactory
 
-import scala.concurrent.Future
+import scala.util.Random
 
-class BootstrapEnd extends Actor with ActorLogging {
+class CollectScriptRemote extends Actor with ActorLogging {
   val cluster = Cluster(context.system)
 
-  val workerRouter = context.actorOf(FromConfig.props(), name = "workerRouter")
-//  println(workerRouter.path.toString)
- val workerRouter2 = context.actorSelection("akka.tcp://ClusterSystem@127.0.0.1:2562/user/collect-script/collect-script")
+  val a = context.actorOf(Props[ABC],name="collect-script")
 
-  implicit val x = cluster.system.dispatcher
-
-  Future {
-    while (true) {
-      Thread.sleep(5000);
-      println("start")
-      workerRouter2 ! "abc"
-    }
-  }
-
+  println(a.path)
 
   override def preStart(): Unit = cluster.subscribe(self, classOf[MemberUp])
 
@@ -42,13 +30,14 @@ class BootstrapEnd extends Actor with ActorLogging {
   }
 }
 
-object BootstrapEnd {
+object CollectScriptRemote {
   def main(args: Array[String]): Unit = {
     val port = args(0)
     val config = ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port)
-      .withFallback(ConfigFactory.load("bootstrap"))
+      .withFallback(ConfigFactory.load("collect-script-remote"))
 
     val system = ActorSystem("ClusterSystem", config)
-    val bootstrap = system.actorOf(Props[BootstrapEnd], name = "bootstrap")
+    val collectScript = system.actorOf(Props[CollectScriptRemote], name = "remote-script")
+
   }
 }
