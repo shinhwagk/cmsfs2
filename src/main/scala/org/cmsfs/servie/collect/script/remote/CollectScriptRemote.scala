@@ -1,18 +1,19 @@
-package org.cmsfs.collect.script.local
+package org.cmsfs.servie.collect.script.remote
 
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import com.typesafe.config.ConfigFactory
+import org.cmsfs.servie.CmsfsClusterInfo
 
 import scala.util.Random
 
-class CollectScriptLocal extends Actor with ActorLogging {
+class CollectScriptRemote extends Actor with ActorLogging {
   val cluster = Cluster(context.system)
 
-  val a = context.actorOf(Props[ABC],name="collect-script")
+  //  val a = context.actorOf(Props[ABC],name="collect-script")
 
-  println(a.path)
+  //  println(a.path)
 
   override def preStart(): Unit = cluster.subscribe(self, classOf[MemberUp])
 
@@ -20,7 +21,7 @@ class CollectScriptLocal extends Actor with ActorLogging {
 
   override def receive: Receive = {
     case MemberUp(member) =>
-      log.info("Member is Up: {}. role: {}", member.address, member.roles)
+      log.info("Member is Up: {}. role: {}.", member.address, member.roles)
     case UnreachableMember(member) =>
       log.info("Member detected as unreachable: {}", member)
     case MemberRemoved(member, previousStatus) =>
@@ -30,14 +31,17 @@ class CollectScriptLocal extends Actor with ActorLogging {
   }
 }
 
-object CollectScriptLocal {
+object CollectScriptRemote {
+
+  import CmsfsClusterInfo._
+
   def main(args: Array[String]): Unit = {
     val port = args(0)
     val config = ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port)
-      .withFallback(ConfigFactory.load("collect-script-local"))
+      .withFallback(ConfigFactory.load(Config_Collect_Script_Remote))
 
-    val system = ActorSystem("ClusterSystem", config)
-    val collectScript = system.actorOf(Props[CollectScriptLocal], name = "local-script")
+    val system = ActorSystem(ClusterName, config)
+    val collectScript = system.actorOf(Props[CollectScriptRemote], name = "remote-script")
 
   }
 }

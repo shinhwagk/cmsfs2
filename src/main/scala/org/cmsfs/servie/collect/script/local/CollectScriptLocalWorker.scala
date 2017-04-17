@@ -1,4 +1,4 @@
-package org.cmsfs.collect.script.local
+package org.cmsfs.servie.collect.script.local
 
 import akka.actor.{Actor, ActorLogging}
 

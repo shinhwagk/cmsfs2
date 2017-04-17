@@ -1,4 +1,4 @@
-package org.cmsfs.collect.jdbc
+package org.cmsfs.servie.collect.jdbc
 
 class CollectJdbcWorker {
 

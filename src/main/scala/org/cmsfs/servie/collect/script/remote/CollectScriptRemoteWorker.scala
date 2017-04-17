@@ -1,4 +1,4 @@
-package org.cmsfs.collect.script.remote
+package org.cmsfs.servie.collect.script.remote
 
 import akka.actor.{Actor, ActorLogging}
 
