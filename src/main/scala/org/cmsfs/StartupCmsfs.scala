@@ -1,6 +1,6 @@
 package org.cmsfs
 
-import org.cmsfs.servie.bootstrap.Bootstrap
+import org.cmsfs.servie.bootstrap.BootstrapActor
 import org.cmsfs.servie.collect.jdbc.CollectJdbc
 import org.cmsfs.servie.collect.script.local.CollectScriptLocal
 import org.cmsfs.servie.collect.script.remote.CollectScriptRemote
@@ -29,7 +29,7 @@ object StartupCmsfs {
       case Service_Collect_Jdbc =>
         CollectJdbc.main(args)
       case Service_Bootstrap =>
-        Bootstrap.main(args)
+        BootstrapActor.main(args)
       case Service_Format_Script =>
         FormatScript.main(args)
       case _ =>

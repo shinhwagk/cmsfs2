@@ -1,7 +1,10 @@
 package org.cmsfs.servie.collect.jdbc
 
-class CollectJdbc {
+import akka.actor.ActorRef
+import org.cmsfs.servie.collect.CollectActorCore
 
+class CollectJdbc extends CollectActorCore {
+  override val worker: ActorRef = ???
 }
 
 object CollectJdbc {

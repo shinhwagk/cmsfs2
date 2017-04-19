@@ -1,6 +1,7 @@
 package org.cmsfs
 
 import akka.actor.ActorSystem
+import akka.cluster.Member
 import com.typesafe.config.{Config, ConfigFactory}
 import org.cmsfs.servie.CmsfsClusterInfo
 
@@ -18,11 +19,29 @@ object Common {
     val config = service match {
       case Service_Collect_Script_Local =>
         genConfig(Role_Collect_Script_Local, port, Config_Collect_Script_Local)
+      case Service_Collect_Script_Remote =>
+        genConfig(Role_Collect_Script_Remote, port, Config_Collect_Script_Remote)
       case Service_Bootstrap =>
         genConfig(Role_Bootstrap, port, Config_Bootstrap)
       case Service_Format_Script =>
         genConfig(Role_Format_Script, port, Config_Format_Script)
     }
     ActorSystem(ClusterName, config)
+  }
+
+  def registerMember(member: Member, role: String, members: IndexedSeq[Member]): IndexedSeq[Member] = {
+    if (member.roles.head == role) {
+      members :+ member
+    } else {
+      members
+    }
+  }
+
+  def unRegisterMember(member: Member, role: String, members: IndexedSeq[Member]): IndexedSeq[Member] = {
+    if (member.roles.head == role) {
+      members.filterNot(_ == member)
+    } else {
+      members
+    }
   }
 }
