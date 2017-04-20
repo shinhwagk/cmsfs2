@@ -12,5 +12,5 @@ class CollectScriptLocalWorker extends Actor with ActorLogging {
 }
 
 object CollectScriptLocalWorker {
-  def props(routerNumber: Int) = RoundRobinPool(routerNumber).props(Props[CollectScriptLocalWorker])
+  val props: Props = Props[CollectScriptLocalWorker]
 }

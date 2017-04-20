@@ -1,9 +1,13 @@
 package org.cmsfs
 
-import akka.actor.ActorSystem
+import akka.actor.{Actor, ActorSystem, Props}
 import akka.cluster.Member
 import com.typesafe.config.{Config, ConfigFactory}
 import org.cmsfs.servie.CmsfsClusterInfo
+import org.cmsfs.servie.collect.script.local.CollectScriptLocalWorker
+
+import scala.collection.mutable
+import scala.collection.mutable.Map
 
 object Common {
 
@@ -21,6 +25,8 @@ object Common {
         genConfig(Role_Collect_Script_Local, port, Config_Collect_Script_Local)
       case Service_Collect_Script_Remote =>
         genConfig(Role_Collect_Script_Remote, port, Config_Collect_Script_Remote)
+      case Service_Collect_Jdbc =>
+        genConfig(Role_Collect_Jdbc, port, Config_Collect_Jdbc)
       case Service_Bootstrap =>
         genConfig(Role_Bootstrap, port, Config_Bootstrap)
       case Service_Format_Script =>
@@ -29,19 +35,33 @@ object Common {
     ActorSystem(ClusterName, config)
   }
 
-  def registerMember(member: Member, role: String, members: IndexedSeq[Member]): IndexedSeq[Member] = {
-    if (member.roles.head == role) {
-      members :+ member
-    } else {
-      members
+  def registerMember(member: Member, serviceMembers: Map[String, IndexedSeq[Member]]): Unit = {
+    val role: String = member.roles.head
+    val members: Option[IndexedSeq[Member]] = serviceMembers.get(member.roles.head)
+    members.foreach { members =>
+      val newMembers: IndexedSeq[Member] = members :+ member
+      serviceMembers += (role -> newMembers)
     }
   }
 
-  def unRegisterMember(member: Member, role: String, members: IndexedSeq[Member]): IndexedSeq[Member] = {
-    if (member.roles.head == role) {
-      members.filterNot(_ == member)
-    } else {
-      members
+  def unRegisterMember(member: Member, serviceMembers: Map[String, IndexedSeq[Member]]): Unit = {
+    val role: String = member.roles.head
+    val members: Option[IndexedSeq[Member]] = serviceMembers.get(member.roles.head)
+    members.foreach { members =>
+      val newMembers: IndexedSeq[Member] = members.filterNot(_ == member)
+      serviceMembers += (role -> newMembers)
     }
+  }
+
+
+  def initNeedServices(serviceNames: Seq[String]): mutable.Map[String, IndexedSeq[Member]] = {
+    import scala.collection.mutable.Map
+
+    val serviceMembers: Map[String, IndexedSeq[Member]] = Map.empty
+
+    for (name <- serviceNames) {
+      serviceMembers += (name -> IndexedSeq.empty[Member])
+    }
+    serviceMembers
   }
 }

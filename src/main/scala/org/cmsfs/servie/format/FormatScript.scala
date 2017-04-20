@@ -34,6 +34,6 @@ object FormatScript {
   def main(args: Array[String]): Unit = {
     val port = args(0)
     val system = Common.genActorSystem(Role_Format_Script, port)
-    val bootstrap = system.actorOf(Props[FormatScript], name = Actor_Format_Script)
+    system.actorOf(Props[FormatScript], name = Actor_Format_Script)
   }
 }
