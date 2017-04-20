@@ -12,8 +12,9 @@ class CollectScriptLocal extends CollectActorCore {
 
 object CollectScriptLocal {
   def main(args: Array[String]): Unit = {
-    val port = args(0)
-    val system = Common.genActorSystem(Service_Collect_Script_Local, port)
+    val seed = args(0)
+    val port = args(1)
+    val system = Common.genActorSystem(Service_Collect_Script_Local, seed, port)
     system.actorOf(Props[CollectScriptLocal], name = Actor_Collect_Script_Local)
   }
 }

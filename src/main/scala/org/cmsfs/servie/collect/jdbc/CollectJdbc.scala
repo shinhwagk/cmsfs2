@@ -12,8 +12,9 @@ class CollectJdbc extends CollectActorCore {
 
 object CollectJdbc {
   def main(args: Array[String]): Unit = {
-    val port = args(0)
-    val system = Common.genActorSystem(Service_Collect_Jdbc, port)
+    val seed = args(0)
+    val port = args(1)
+    val system = Common.genActorSystem(Service_Collect_Jdbc, seed, port)
     system.actorOf(Props[CollectJdbc], name = Actor_Collect_Jdbc)
   }
 }

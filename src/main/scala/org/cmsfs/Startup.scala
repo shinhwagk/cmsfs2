@@ -11,15 +11,16 @@ object Startup {
     if (args.length >= 2) {
       val service = args(0)
       val port = args(1)
-      runServiceMatch(service, port)
+      val seed = args(2)
+      runServiceMatch(service, port, seed)
     } else {
       println("startup parameter should number >= 2.")
       System.exit(1)
     }
   }
 
-  def runServiceMatch(service: String, port: String): Unit = {
-    val args = Seq(port).toArray
+  def runServiceMatch(service: String, port: String, seed: String): Unit = {
+    val args = Seq(seed, port).toArray
     import ClusterInfo._
     service match {
       case Service_Collect_Script_Local =>

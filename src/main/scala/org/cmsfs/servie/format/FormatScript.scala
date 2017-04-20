@@ -27,8 +27,9 @@ class FormatScript extends Actor with ActorLogging {
 
 object FormatScript {
   def main(args: Array[String]): Unit = {
-    val port = args(0)
-    val system = Common.genActorSystem(Role_Format_Script, port)
+    val seed = args(0)
+    val port = args(1)
+    val system = Common.genActorSystem(Role_Format_Script, seed, port)
     system.actorOf(Props[FormatScript], name = Actor_Format_Script)
   }
 }

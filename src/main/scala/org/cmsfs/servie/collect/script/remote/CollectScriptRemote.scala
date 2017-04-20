@@ -12,8 +12,9 @@ class CollectScriptRemote extends CollectActorCore {
 
 object CollectScriptRemote {
   def main(args: Array[String]): Unit = {
-    val port = args(0)
-    val system = Common.genActorSystem(Service_Collect_Script_Remote, port)
+    val seed = args(0)
+    val port = args(1)
+    val system = Common.genActorSystem(Service_Collect_Script_Remote, seed, port)
     system.actorOf(Props[CollectScriptRemote], name = Actor_Collect_Script_Remote)
   }
 }

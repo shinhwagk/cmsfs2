@@ -75,8 +75,9 @@ object BootstrapActor {
   import ClusterInfo._
 
   def main(args: Array[String]): Unit = {
-    val port = args(0)
-    val system = Common.genActorSystem(Role_Bootstrap, port)
+    val seed = args(0)
+    val port = args(1)
+    val system = Common.genActorSystem(Role_Bootstrap, seed, port)
     val bootstrap = system.actorOf(Props[BootstrapActor], name = Service_Bootstrap)
 
     import system.dispatcher
