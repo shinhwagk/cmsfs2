@@ -1,6 +1,6 @@
-package org.cmsfs.servie
+package org.cmsfs
 
-object CmsfsClusterInfo {
+object ClusterInfo {
   val ClusterName = "ClusterSystem"
   val Service_Collect_Script_Remote, Config_Collect_Script_Remote, Role_Collect_Script_Remote, Actor_Collect_Script_Remote = "collect-script-remote"
   val Service_Collect_Script_Local, Config_Collect_Script_Local, Role_Collect_Script_Local, Actor_Collect_Script_Local = "collect-script-local"

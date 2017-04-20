@@ -1,12 +1,10 @@
 package org.cmsfs.servie.format
 
-import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
+import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent.{MemberEvent, MemberRemoved, MemberUp, UnreachableMember}
-import com.typesafe.config.ConfigFactory
-import org.cmsfs.Common
-import org.cmsfs.servie.CmsfsClusterInfo
-import org.cmsfs.servie.CmsfsClusterInfo.Role_Collect_Script_Local
+import org.cmsfs.{ClusterInfo, Common}
+import ClusterInfo._
 
 class FormatScript extends Actor with ActorLogging {
   val cluster = Cluster(context.system)
@@ -28,9 +26,6 @@ class FormatScript extends Actor with ActorLogging {
 }
 
 object FormatScript {
-
-  import CmsfsClusterInfo._
-
   def main(args: Array[String]): Unit = {
     val port = args(0)
     val system = Common.genActorSystem(Role_Format_Script, port)

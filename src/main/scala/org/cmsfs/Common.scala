@@ -1,17 +1,15 @@
 package org.cmsfs
 
-import akka.actor.{Actor, ActorSystem, Props}
+import akka.actor.ActorSystem
 import akka.cluster.Member
 import com.typesafe.config.{Config, ConfigFactory}
-import org.cmsfs.servie.CmsfsClusterInfo
-import org.cmsfs.servie.collect.script.local.CollectScriptLocalWorker
 
 import scala.collection.mutable
 import scala.collection.mutable.Map
 
 object Common {
 
-  import CmsfsClusterInfo._
+  import ClusterInfo._
 
   private def genConfig(role: String, port: String, config: String): Config = {
     ConfigFactory.parseString(s"akka.remote.netty.tcp.port = ${port}")

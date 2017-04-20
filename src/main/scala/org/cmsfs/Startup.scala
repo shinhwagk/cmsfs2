@@ -6,7 +6,7 @@ import org.cmsfs.servie.collect.script.local.CollectScriptLocal
 import org.cmsfs.servie.collect.script.remote.CollectScriptRemote
 import org.cmsfs.servie.format.FormatScript
 
-object StartupCmsfs {
+object Startup {
   def main(args: Array[String]): Unit = {
     if (args.length >= 2) {
       val service = args(0)
@@ -20,7 +20,7 @@ object StartupCmsfs {
 
   def runServiceMatch(service: String, port: String): Unit = {
     val args = Seq(port).toArray
-    import org.cmsfs.servie.CmsfsClusterInfo._
+    import ClusterInfo._
     service match {
       case Service_Collect_Script_Local =>
         CollectScriptLocal.main(args)

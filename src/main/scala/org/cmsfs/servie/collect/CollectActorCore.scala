@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import org.cmsfs.Common
-import org.cmsfs.servie.CmsfsClusterInfo._
+import org.cmsfs.ClusterInfo._
 import org.cmsfs.servie.collect.jdbc.CollectJdbcMessages
 import org.cmsfs.servie.collect.script.local.CollectScriptLocalMessages
 import org.cmsfs.servie.collect.script.remote.CollectScriptRemoteMessages

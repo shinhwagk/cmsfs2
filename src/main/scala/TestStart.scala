@@ -1,11 +1,11 @@
-import org.cmsfs.StartupCmsfs
+import org.cmsfs.Startup
 
 object TestStart {
   def main(args: Array[String]): Unit = {
-    StartupCmsfs.main(Seq("bootstrap", "2573").toArray)
+    Startup.main(Seq("bootstrap", "2579").toArray)
 //    Thread.sleep(1000)
 //    StartupCmsfs.main(Seq("collect-script-local", "2765").toArray)
     Thread.sleep(1000)
-    StartupCmsfs.main(Seq("format-script", "2764").toArray)
+    Startup.main(Seq("format-script", "2769").toArray)
   }
 }

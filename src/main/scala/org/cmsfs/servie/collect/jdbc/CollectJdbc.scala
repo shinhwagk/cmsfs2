@@ -3,7 +3,7 @@ package org.cmsfs.servie.collect.jdbc
 import akka.actor.{ActorRef, Props}
 import akka.routing.FromConfig
 import org.cmsfs.Common
-import org.cmsfs.servie.CmsfsClusterInfo.{Actor_Collect_Jdbc, Service_Collect_Jdbc}
+import org.cmsfs.ClusterInfo.{Actor_Collect_Jdbc, Service_Collect_Jdbc}
 import org.cmsfs.servie.collect.CollectActorCore
 
 class CollectJdbc extends CollectActorCore {
