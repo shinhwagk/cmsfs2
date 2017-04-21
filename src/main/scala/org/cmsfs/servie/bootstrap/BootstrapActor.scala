@@ -61,7 +61,8 @@ class BootstrapActor extends Actor with ActorLogging {
     serviceMembers.foreach { case (name, members) =>
       name match {
         case Service_Collect_Script_Local =>
-          schedulerActor ! SchedulerCollectScriptLocalMessages(CollectScriptLocalMessages.WorkerJob("disk_space", Seq("ABC", "CC"), "aaa"), members)
+          schedulerActor ! SchedulerCollectScriptLocalMessages(CollectScriptLocalMessages.WorkerJob("disk_space", Seq("ABC", "CC"), Some("a"), "aaa"), members)
+          schedulerActor ! SchedulerCollectScriptLocalMessages(CollectScriptLocalMessages.WorkerJob("disk_space", Seq("ABC", "CC"), Some("a"), "aaa"), members)
         case _ =>
       }
     }
@@ -74,7 +75,7 @@ object BootstrapActor {
 
   import ClusterInfo._
 
-  def main(args: Array[String]): Unit = {
+  def main(args : Array[String]): Unit = {
     val seed = args(0)
     val port = args(1)
     val system = Common.genActorSystem(Role_Bootstrap, seed, port)

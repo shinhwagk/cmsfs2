@@ -8,6 +8,8 @@ import org.cmsfs.ClusterInfo._
 import org.cmsfs.servie.collect.jdbc.CollectJdbcMessages
 import org.cmsfs.servie.collect.script.local.CollectScriptLocalMessages
 import org.cmsfs.servie.collect.script.remote.CollectScriptRemoteMessages
+import org.cmsfs.servie.collect.script.ssh.CollectScriptSshMessages
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -43,6 +45,7 @@ trait CollectActorCore extends Actor with ActorLogging {
       workerMessage match {
         case mgs: CollectScriptLocalMessages.WorkerJob => worker ! mgs
         case mgs: CollectScriptRemoteMessages.WorkerJob => worker ! mgs
+        case mgs: CollectScriptSshMessages.WorkerJob => worker ! mgs
         case mgs: CollectJdbcMessages.WorkerJob => worker ! mgs
         case _ => ???
       }

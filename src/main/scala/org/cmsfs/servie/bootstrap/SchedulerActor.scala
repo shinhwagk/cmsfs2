@@ -13,11 +13,17 @@ class SchedulerActor extends Actor with ActorLogging {
 
   override def receive: Receive = {
     case SchedulerCollectScriptLocalMessages(job, members) =>
-      members.foreach(member => context.actorSelection(RootActorPath(member.address) / "user" / Actor_Collect_Script_Local) ! job)
+      members.foreach(member =>
+        context.actorSelection(RootActorPath(member.address) / "user" / Actor_Collect_Script_Local)
+          ! job)
     case RegisterCollectScriptRemote(members) =>
-      members.foreach(member => context.actorSelection(RootActorPath(member.address) / "user" / Actor_Collect_Script_Remote) ! CollectScriptRemoteMessages.WorkerJob("xxxxxxxxxx"))
+      members.foreach(member =>
+        context.actorSelection(RootActorPath(member.address) / "user" / Actor_Collect_Script_Remote)
+          ! CollectScriptRemoteMessages.WorkerJob("xxxxxxxxxx"))
     case RegisterCollectJdbc(members) =>
-      members.foreach(member => context.actorSelection(RootActorPath(member.address) / "user" / Actor_Collect_Jdbc) ! CollectJdbcMessages.WorkerJob("aaa"))
+      members.foreach(member =>
+        context.actorSelection(RootActorPath(member.address) / "user" / Actor_Collect_Jdbc)
+          ! CollectJdbcMessages.WorkerJob("aaa"))
     case RegisterCollectScriptRemote(members) => println("111")
     case _ => println("aaaa")
     //      FormatScripts :+ member
