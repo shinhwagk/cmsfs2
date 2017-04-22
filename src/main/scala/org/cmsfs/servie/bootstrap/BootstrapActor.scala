@@ -7,7 +7,7 @@ import akka.routing.RoundRobinPool
 import org.cmsfs.ClusterInfo._
 import org.cmsfs.servie.bootstrap.BootstrapActor.MessageScheduler
 import org.cmsfs.servie.bootstrap.SchedulerActor.SchedulerCollectScriptLocalMessages
-import org.cmsfs.servie.collect.script.local.CollectScriptLocalMessages
+import org.cmsfs.servie.collect.local.script.CollectLocalScriptMessages
 import org.cmsfs.{ClusterInfo, Common}
 
 import scala.collection.mutable
@@ -61,8 +61,9 @@ class BootstrapActor extends Actor with ActorLogging {
     serviceMembers.foreach { case (name, members) =>
       name match {
         case Service_Collect_Script_Local =>
-          schedulerActor ! SchedulerCollectScriptLocalMessages(CollectScriptLocalMessages.WorkerJob("disk_space", Seq("ABC", "CC"), Some("a"), "aaa"), members)
-          schedulerActor ! SchedulerCollectScriptLocalMessages(CollectScriptLocalMessages.WorkerJob("disk_space", Seq("ABC", "CC"), Some("a"), "aaa"), members)
+          schedulerActor ! SchedulerCollectScriptLocalMessages(CollectLocalScriptMessages.WorkerJob("disk_space", Seq("ABC", "CC"), Some("a"), "aaa"), members)
+        case Service_Collect_Script_Remote =>
+        case Service_Collect_Jdbc =>
         case _ =>
       }
     }
@@ -75,7 +76,7 @@ object BootstrapActor {
 
   import ClusterInfo._
 
-  def main(args : Array[String]): Unit = {
+  def main(args: Array[String]): Unit = {
     val seed = args(0)
     val port = args(1)
     val system = Common.genActorSystem(Role_Bootstrap, seed, port)

@@ -1,8 +1,7 @@
-package org.cmsfs.servie.collect.script.local
+package org.cmsfs.servie.collect.local.script
 
 import akka.actor.{Actor, ActorLogging, Props}
-import akka.routing.RoundRobinPool
-import org.cmsfs.servie.collect.script.local.CollectScriptLocalMessages.WorkerJob
+import org.cmsfs.servie.collect.ssh.script.CollectSshScriptMessages.WorkerJob
 
 class CollectScriptLocalWorker extends Actor with ActorLogging {
   override def receive: Receive = {

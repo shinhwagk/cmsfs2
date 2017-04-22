@@ -3,23 +3,14 @@ package org.cmsfs.servie.collect
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
-import org.cmsfs.Common
 import org.cmsfs.ClusterInfo._
+import org.cmsfs.Common
 import org.cmsfs.servie.collect.jdbc.CollectJdbcMessages
-import org.cmsfs.servie.collect.script.local.CollectScriptLocalMessages
-import org.cmsfs.servie.collect.script.remote.CollectScriptRemoteMessages
-import org.cmsfs.servie.collect.script.ssh.CollectScriptSshMessages
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import org.cmsfs.servie.collect.local.script.CollectLocalScriptMessages
+import org.cmsfs.servie.collect.ssh.script.CollectSshScriptMessages
 
 trait CollectActorCore extends Actor with ActorLogging {
   val cluster = Cluster(context.system)
-
-  Future {
-    Thread.sleep(10000)
-    cluster.leave(cluster.selfAddress)
-  }
 
   val worker: ActorRef;
 
@@ -43,9 +34,8 @@ trait CollectActorCore extends Actor with ActorLogging {
       log.info("Member is Removed: {} after {}", member.address, previousStatus)
     case workerMessage: CollectWorkerMessage =>
       workerMessage match {
-        case mgs: CollectScriptLocalMessages.WorkerJob => worker ! mgs
-        case mgs: CollectScriptRemoteMessages.WorkerJob => worker ! mgs
-        case mgs: CollectScriptSshMessages.WorkerJob => worker ! mgs
+        case mgs: CollectLocalScriptMessages.WorkerJob => worker ! mgs
+        case mgs: CollectSshScriptMessages.WorkerJob => worker ! mgs
         case mgs: CollectJdbcMessages.WorkerJob => worker ! mgs
         case _ => ???
       }

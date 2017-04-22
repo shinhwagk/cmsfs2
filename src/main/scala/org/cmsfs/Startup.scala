@@ -1,9 +1,9 @@
 package org.cmsfs
 
 import org.cmsfs.servie.bootstrap.BootstrapActor
-import org.cmsfs.servie.collect.jdbc.CollectJdbc
-import org.cmsfs.servie.collect.script.local.CollectScriptLocal
-import org.cmsfs.servie.collect.script.remote.CollectScriptRemote
+import org.cmsfs.servie.collect.jdbc.CollectJdbcService
+import org.cmsfs.servie.collect.local.script.CollectScriptLocalService
+import org.cmsfs.servie.collect.ssh.script.CollectScriptRemote
 import org.cmsfs.servie.format.FormatScript
 
 object Startup {
@@ -24,11 +24,11 @@ object Startup {
     import ClusterInfo._
     service match {
       case Service_Collect_Script_Local =>
-        CollectScriptLocal.main(args)
+        CollectScriptLocalService.main(args)
       case Service_Collect_Script_Remote =>
         CollectScriptRemote.main(args)
       case Service_Collect_Jdbc =>
-        CollectJdbc.main(args)
+        CollectJdbcService.main(args)
       case Service_Bootstrap =>
         BootstrapActor.main(args)
       case Service_Format_Script =>

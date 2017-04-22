@@ -1,13 +1,13 @@
-package org.cmsfs.servie.collect.script.remote
+package org.cmsfs.servie.collect.ssh.script
 
 import akka.actor.{ActorRef, Props}
 import akka.routing.FromConfig
-import org.cmsfs.Common
 import org.cmsfs.ClusterInfo._
+import org.cmsfs.Common
 import org.cmsfs.servie.collect.CollectActorCore
 
 class CollectScriptRemote extends CollectActorCore {
-  override val worker: ActorRef = context.actorOf(FromConfig.props(CollectScriptRemoteWorker.props), "worker")
+  override val worker: ActorRef = context.actorOf(FromConfig.props(CollectSshScriptWorker.props), "worker")
 }
 
 object CollectScriptRemote {
