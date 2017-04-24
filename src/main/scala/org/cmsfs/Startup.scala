@@ -1,10 +1,10 @@
 package org.cmsfs
 
-import org.cmsfs.servie.bootstrap.BootstrapActor
+import org.cmsfs.servie.bootstrap.BootstrapService
 import org.cmsfs.servie.collect.jdbc.CollectJdbcService
 import org.cmsfs.servie.collect.local.script.CollectLocalScriptService
 import org.cmsfs.servie.collect.ssh.script.CollectSshScriptService
-import org.cmsfs.servie.format.FormatScript
+import org.cmsfs.servie.format.FormatScriptService
 
 object Startup {
   def main(args: Array[String]): Unit = {
@@ -23,16 +23,16 @@ object Startup {
     val args = Seq(seed, port).toArray
     import ClusterInfo._
     service match {
+      case Service_Bootstrap =>
+        BootstrapService.main(args)
       case Service_Collect_Local_Script =>
         CollectLocalScriptService.main(args)
       case Service_Collect_Ssh_Script =>
         CollectSshScriptService.main(args)
       case Service_Collect_Jdbc =>
         CollectJdbcService.main(args)
-      case Service_Bootstrap =>
-        BootstrapActor.main(args)
       case Service_Format_Script =>
-        FormatScript.main(args)
+        FormatScriptService.main(args)
       case _ =>
         println(s"startup service: ${service} no exist.")
         System.exit(1)

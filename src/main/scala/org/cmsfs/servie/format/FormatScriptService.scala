@@ -5,9 +5,12 @@ import akka.cluster.Cluster
 import akka.cluster.ClusterEvent.{MemberEvent, MemberRemoved, MemberUp, UnreachableMember}
 import org.cmsfs.{ClusterInfo, Common}
 import ClusterInfo._
+import akka.routing.FromConfig
 
-class FormatScript extends Actor with ActorLogging {
+class FormatScriptService extends Actor with ActorLogging {
   val cluster = Cluster(context.system)
+
+  val worker = context.actorOf(FromConfig.props(FormatScriptWorker.props), "worker")
 
   override def preStart(): Unit = cluster.subscribe(self, classOf[MemberUp])
 
@@ -21,15 +24,16 @@ class FormatScript extends Actor with ActorLogging {
     case MemberRemoved(member, previousStatus) =>
       log.info("Member is Removed: {} after {}",
         member.address, previousStatus)
+    case job: FormatScriptMessages.WorkerJob => worker ! job
     case _: MemberEvent => // ignore
   }
 }
 
-object FormatScript {
+object FormatScriptService {
   def main(args: Array[String]): Unit = {
     val seed = args(0)
     val port = args(1)
     val system = Common.genActorSystem(Role_Format_Script, seed, port)
-    system.actorOf(Props[FormatScript], name = Actor_Format_Script)
+    system.actorOf(Props[FormatScriptService], name = Actor_Format_Script)
   }
 }

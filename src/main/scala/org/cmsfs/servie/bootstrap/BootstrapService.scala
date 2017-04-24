@@ -5,12 +5,13 @@ import java.util.Date
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.cluster.ClusterEvent._
 import akka.cluster.{Cluster, Member, MemberStatus}
-import akka.routing.RoundRobinPool
+import akka.routing.{FromConfig, RoundRobinPool}
 import org.cmsfs.ClusterInfo._
 import org.cmsfs.config.QueryConfig
 import org.cmsfs.config.db.{CoreCollect, CoreConnectorSsh, CoreMonitorDetail}
-import org.cmsfs.servie.bootstrap.BootstrapActor.MessageScheduler
+import org.cmsfs.servie.bootstrap.BootstrapService.MessageScheduler
 import org.cmsfs.servie.bootstrap.SchedulerActor.{SchedulerCollectLocalScriptMessages, SchedulerCollectSshScriptMessages}
+import org.cmsfs.servie.collect.jdbc.CollectJdbcWorker
 import org.cmsfs.servie.collect.local.script.CollectLocalScriptMessages
 import org.cmsfs.servie.collect.ssh.script.CollectSshScriptMessages
 import org.cmsfs.servie.collect.ssh.script.CollectSshScriptMessages.Collector
@@ -20,14 +21,14 @@ import org.quartz.CronExpression
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
-class BootstrapActor extends Actor with ActorLogging {
+class BootstrapService extends Actor with ActorLogging {
 
-  val memberNames: Seq[String] =
-    Service_Collect_Ssh_Script ::
-      Service_Collect_Local_Script ::
-      Service_Collect_Jdbc ::
-      Nil
+  val memberNames: Seq[String] = Service_Collect_Ssh_Script ::
+    Service_Collect_Local_Script ::
+    Service_Collect_Jdbc ::
+    Nil
 
   val serviceMembers: mutable.Map[String, IndexedSeq[Member]] = Common.initNeedServices(memberNames)
 
@@ -35,7 +36,7 @@ class BootstrapActor extends Actor with ActorLogging {
 
   import context.dispatcher
 
-  val schedulerActor: ActorRef = context.actorOf(RoundRobinPool(10).props(SchedulerActor.props), "scheduler")
+  val schedulerActor: ActorRef = context.actorOf(SchedulerActor.props, "scheduler")
 
   override def preStart(): Unit =
     cluster.subscribe(self, classOf[MemberUp],
@@ -82,10 +83,13 @@ class BootstrapActor extends Actor with ActorLogging {
               for (conn <- conns) {
                 val n_collect = CollectSshScriptMessages.Collector(collect.name, collect.path, collect.args)
                 val n_connector = CollectSshScriptMessages.Connector(conn.name, conn.ip, conn.port, conn.user, conn.password, conn.privateKey)
-                schedulerActor ! SchedulerCollectSshScriptMessages(CollectSshScriptMessages.WorkerJob(collect.name, n_connector, n_collect, "aa"), serviceMembers.get("collect-ssh-ssh").get)
+                schedulerActor ! SchedulerCollectSshScriptMessages(CollectSshScriptMessages.WorkerJob(collect.name, n_connector, n_collect, "aa"),
+                  serviceMembers.get(Service_Collect_Ssh_Script).get)
               }
             }
-          case "jdbc" =>
+          //          case "jdbc" =>
+          case _ =>
+            println(md.connectorMode)
         }
       }
     }
@@ -102,7 +106,7 @@ class BootstrapActor extends Actor with ActorLogging {
   }
 }
 
-object BootstrapActor {
+object BootstrapService {
 
   import ClusterInfo._
 
@@ -110,11 +114,11 @@ object BootstrapActor {
     val seed = args(0)
     val port = args(1)
     val system = Common.genActorSystem(Role_Bootstrap, seed, port)
-    val bootstrap = system.actorOf(Props[BootstrapActor], name = Service_Bootstrap)
+    val bootstrap = system.actorOf(Props[BootstrapService], name = Service_Bootstrap)
 
     import system.dispatcher
 
-    system.scheduler.schedule(2.seconds, 2.seconds, bootstrap, MessageScheduler)
+    system.scheduler.schedule(0.seconds, 1.seconds, bootstrap, MessageScheduler)
   }
 
   case object MessageScheduler

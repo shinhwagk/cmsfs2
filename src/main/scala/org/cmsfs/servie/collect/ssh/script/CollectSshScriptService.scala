@@ -7,8 +7,7 @@ import org.cmsfs.Common
 import org.cmsfs.servie.collect.CollectActorCore
 
 class CollectSshScriptService extends CollectActorCore {
-  val formatMember = serviceMembers.get(Service_Format_Script).get
-  override val worker: ActorRef = context.actorOf(FromConfig.props(CollectSshScriptWorker.props(formatMember)), "worker")
+  override val worker: ActorRef = context.actorOf(FromConfig.props(CollectSshScriptWorker.props(serviceMembers)), "worker")
 }
 
 object CollectSshScriptService {

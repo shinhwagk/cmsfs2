@@ -1,13 +1,15 @@
 package org.cmsfs.servie.collect
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
-import akka.cluster.Cluster
+import akka.cluster.{Cluster, Member}
 import akka.cluster.ClusterEvent._
 import org.cmsfs.ClusterInfo._
 import org.cmsfs.Common
 import org.cmsfs.servie.collect.jdbc.CollectJdbcMessages
 import org.cmsfs.servie.collect.local.script.CollectLocalScriptMessages
 import org.cmsfs.servie.collect.ssh.script.CollectSshScriptMessages
+
+import scala.collection.mutable
 
 trait CollectActorCore extends Actor with ActorLogging {
   val cluster = Cluster(context.system)

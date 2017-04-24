@@ -5,6 +5,7 @@ import java.net.URL
 import java.nio.charset.Charset
 import java.util.concurrent.ThreadLocalRandom
 
+import com.typesafe.config.ConfigFactory
 import org.apache.commons.io.FileUtils
 import org.cmsfs.common.ScriptExecutorMode.ScriptExecuteMode
 import play.api.libs.json.Json
@@ -13,8 +14,10 @@ import scala.io.Source
 
 object ScriptExecute {
 
-  private def getUrlByPath(path: String): String = {
-    Json.parse(path).as[List[String]] mkString "/"
+  private val formatUrl: String = ConfigFactory.load().getString("cmsfs.url")
+
+  def getUrlByPath(path: String): String = {
+    formatUrl :: Json.parse(path).as[List[String]] mkString "/"
   }
 
   private def getUrlContentByPath(path: String): String = {

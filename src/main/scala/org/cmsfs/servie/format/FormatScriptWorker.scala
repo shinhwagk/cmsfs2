@@ -1,12 +1,17 @@
 package org.cmsfs.servie.format
 
-import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
-import com.typesafe.config.ConfigFactory
+import akka.actor.{Actor, ActorLogging, Props}
+import org.cmsfs.servie.format.FormatScriptMessages.WorkerJob
 
 class FormatScriptWorker extends Actor with ActorLogging {
-  override def receive: Receive = ???
+  println("FormatScriptWorker start.")
+
+  override def receive: Receive = {
+    case job: WorkerJob =>
+      println("FormatScriptWorker", job)
+  }
 }
 
 object FormatScriptWorker {
-
+  val props = Props[FormatScriptWorker]
 }
