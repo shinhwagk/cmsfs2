@@ -1,29 +1,39 @@
 package org.cmsfs.servie.bootstrap
 
+import java.util.Date
+
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.cluster.ClusterEvent._
 import akka.cluster.{Cluster, Member, MemberStatus}
 import akka.routing.RoundRobinPool
 import org.cmsfs.ClusterInfo._
+import org.cmsfs.config.QueryConfig
+import org.cmsfs.config.db.{CoreCollect, CoreConnectorSsh, CoreMonitorDetail}
 import org.cmsfs.servie.bootstrap.BootstrapActor.MessageScheduler
-import org.cmsfs.servie.bootstrap.SchedulerActor.SchedulerCollectScriptLocalMessages
+import org.cmsfs.servie.bootstrap.SchedulerActor.{SchedulerCollectLocalScriptMessages, SchedulerCollectSshScriptMessages}
 import org.cmsfs.servie.collect.local.script.CollectLocalScriptMessages
+import org.cmsfs.servie.collect.ssh.script.CollectSshScriptMessages
+import org.cmsfs.servie.collect.ssh.script.CollectSshScriptMessages.Collector
 import org.cmsfs.{ClusterInfo, Common}
+import org.quartz.CronExpression
 
 import scala.collection.mutable
+import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class BootstrapActor extends Actor with ActorLogging {
 
   val memberNames: Seq[String] =
-    Service_Collect_Script_Remote ::
-      Service_Collect_Script_Local ::
+    Service_Collect_Ssh_Script ::
+      Service_Collect_Local_Script ::
       Service_Collect_Jdbc ::
       Nil
 
   val serviceMembers: mutable.Map[String, IndexedSeq[Member]] = Common.initNeedServices(memberNames)
 
   val cluster = Cluster(context.system)
+
+  import context.dispatcher
 
   val schedulerActor: ActorRef = context.actorOf(RoundRobinPool(10).props(SchedulerActor.props), "scheduler")
 
@@ -58,17 +68,37 @@ class BootstrapActor extends Actor with ActorLogging {
   }
 
   def schedulerAction() = {
-    serviceMembers.foreach { case (name, members) =>
-      name match {
-        case Service_Collect_Script_Local =>
-          schedulerActor ! SchedulerCollectScriptLocalMessages(CollectLocalScriptMessages.WorkerJob("disk_space", Seq("ABC", "CC"), Some("a"), "aaa"), members)
-        case Service_Collect_Script_Remote =>
-        case Service_Collect_Jdbc =>
-        case _ =>
+    val cDate = new Date()
+    QueryConfig.getCoreMonitorDetails.foreach { cmds =>
+      val validMonitorDetails: Seq[CoreMonitorDetail] = filterMonitorDetails(cDate)(cmds)
+      validMonitorDetails.foreach { md =>
+        md.connectorMode match {
+          case "ssh" =>
+            val f: Future[(CoreCollect, Seq[CoreConnectorSsh])] = for {
+              collect <- QueryConfig.getCoreCollectById(md.collectId)
+              conns <- Future.sequence(md.connectorIds.map(id => QueryConfig.getCoreConnectorSshById(id)))
+            } yield (collect, conns)
+            f.foreach { case (collect, conns) =>
+              for (conn <- conns) {
+                val n_collect = CollectSshScriptMessages.Collector(collect.name, collect.path, collect.args)
+                val n_connector = CollectSshScriptMessages.Connector(conn.name, conn.ip, conn.port, conn.user, conn.password, conn.privateKey)
+                schedulerActor ! SchedulerCollectSshScriptMessages(CollectSshScriptMessages.WorkerJob(collect.name, n_connector, n_collect, "aa"), serviceMembers.get("collect-ssh-ssh").get)
+              }
+            }
+          case "jdbc" =>
+        }
       }
     }
-    //    schedulerActor ! RegisterCollectScriptRemote(serviceMembers.get(Service_Collect_Script_Remote).get)
-    //    schedulerActor ! RegisterCollectJdbc(serviceMembers.get(Service_Collect_Jdbc).get)
+  }
+
+  def filterCron(cron: String, cDate: Date): Boolean = {
+    new CronExpression(cron).isSatisfiedBy(cDate)
+  }
+
+  def filterMonitorDetails(cDate: Date)(monitorDetails: Seq[CoreMonitorDetail]): Seq[CoreMonitorDetail] = {
+    val view = monitorDetails.filter(cmd => filterCron(cmd.cron, cDate))
+    log.info(s"filter monitor detail ${view.map(_.id).toString()} ${cDate.toString} - ${view.map(_.collectId).toString()}")
+    view
   }
 }
 

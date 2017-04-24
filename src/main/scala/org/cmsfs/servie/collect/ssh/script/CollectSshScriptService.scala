@@ -6,15 +6,16 @@ import org.cmsfs.ClusterInfo._
 import org.cmsfs.Common
 import org.cmsfs.servie.collect.CollectActorCore
 
-class CollectScriptRemote extends CollectActorCore {
-  override val worker: ActorRef = context.actorOf(FromConfig.props(CollectSshScriptWorker.props), "worker")
+class CollectSshScriptService extends CollectActorCore {
+  val formatMember = serviceMembers.get(Service_Format_Script).get
+  override val worker: ActorRef = context.actorOf(FromConfig.props(CollectSshScriptWorker.props(formatMember)), "worker")
 }
 
-object CollectScriptRemote {
+object CollectSshScriptService {
   def main(args: Array[String]): Unit = {
     val seed = args(0)
     val port = args(1)
-    val system = Common.genActorSystem(Service_Collect_Script_Remote, seed, port)
-    system.actorOf(Props[CollectScriptRemote], name = Actor_Collect_Script_Remote)
+    val system = Common.genActorSystem(Service_Collect_Ssh_Script, seed, port)
+    system.actorOf(Props[CollectSshScriptService], name = Actor_Collect_Ssh_Script)
   }
 }
