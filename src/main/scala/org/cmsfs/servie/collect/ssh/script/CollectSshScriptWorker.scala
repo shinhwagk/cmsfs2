@@ -5,14 +5,19 @@ import akka.cluster.Member
 import org.cmsfs.ClusterInfo._
 import org.cmsfs.servie.collect.ssh.script.CollectSshScriptMessages.WorkerJob
 import org.cmsfs.servie.format.FormatScriptMessages
-import org.cmsfs.servie.format.FormatScriptMessages.Format
 
 import scala.collection.mutable
 import scala.util.Random
 
 class CollectSshScriptWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]]) extends CollectSshScriptWorkerAction with Actor with ActorLogging {
+
+  var processCapacityCalculate = 0L
+
   override def receive: Receive = {
     case job: WorkerJob =>
+
+      processCapacityCalculate += 1
+
       val formatMembers = serviceMembers.get(Service_Format_Script).get
       if (formatMembers.length >= 1) {
         val path = job.collect.path
@@ -22,10 +27,16 @@ class CollectSshScriptWorker(serviceMembers: mutable.Map[String, IndexedSeq[Memb
         val user = job.connect.username
         val rs: Option[String] = executeScriptBySsh(ip, port, user, path)
 
-        val random_index = new Random().nextInt(formatMembers.length)
-        val member = formatMembers(random_index)
-        val format = Format("a", Some("a"), "")
-        context.actorSelection(RootActorPath(member.address) / "user" / Service_Format_Script) ! FormatScriptMessages.WorkerJob(rs.get, format)
+        processCapacityCalculate -= 1
+        job.next.foreach { case (mode, ids) =>
+
+          ids.foreach { id =>
+            val random_index = new Random().nextInt(formatMembers.length)
+            val member = formatMembers(random_index)
+            context.actorSelection(RootActorPath(member.address) / "user" / Service_Format_Script) ! FormatScriptMessages.WorkerJob(rs, job.utcDate, job.connect.name, (mode, id))
+          }
+        }
+        println(s"CollectSshScriptWorker: ${processCapacityCalculate}")
       } else {
         println("format service member less.")
       }

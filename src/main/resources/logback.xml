@@ -1,7 +1,7 @@
 <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
         <pattern>
-            %-5level %logger{36} [req: %X{requestId}, visitor: %X{visitorId}] - %msg%n
+            %coloredLevel - %d{yyyy-MM-dd HH:mm:ss, ${logback.timezone:-Asia/Shanghai}} - %logger{15} - %message%n%xException{10}
         </pattern>
     </encoder>
 </appender>

@@ -10,6 +10,7 @@ import org.apache.commons.io.FileUtils
 import org.cmsfs.common.ScriptExecutorMode.ScriptExecuteMode
 import play.api.libs.json.Json
 
+import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
 object ScriptExecute {
@@ -20,7 +21,7 @@ object ScriptExecute {
     formatUrl :: Json.parse(path).as[List[String]] mkString "/"
   }
 
-  private def getUrlContentByPath(path: String): String = {
+  def getUrlContentByPath(path: String): String = {
     Source.fromURL(getUrlByPath(path), "UTF-8").mkString.trim
   }
 
@@ -41,15 +42,15 @@ object ScriptExecute {
   private def downScript(url: String, dirPath: String): String = {
     val scriptName = url.split("/").last
     FileUtils.copyURLToFile(new URL(url), new File(dirPath + "/" + scriptName))
-    scriptName
+    dirPath + "/" + scriptName
   }
 
   private def writeFile(fileName: String, content: String): Unit =
     FileUtils.writeStringToFile(new File(fileName), content, Charset.forName("UTF-8"), false)
 
   private def executorChoice(url: String, executeMode: ScriptExecuteMode): Seq[String] = {
-    val name = url.split(".").last
-    if (ScriptExecutorMode.ONLINE == executeMode) {
+    val name = url.split("\\.").last
+    if (ScriptExecutorMode.DOWN == executeMode) {
       name match {
         case "py" => Seq("python")
         case "sh" => Seq("sh")
@@ -94,13 +95,19 @@ object ScriptExecute {
 
   private def executeScriptForDown(url: String, dataOpt: Option[String], argsOpt: Option[String]): String = {
     import sys.process._
-    val executor: Seq[String] = executorChoice(url, ScriptExecutorMode.DOWN)
+    var executor: Seq[String] = executorChoice(url, ScriptExecutorMode.DOWN)
     val (workDirName, deleteWorkDirFun) = createWorkDirAndDeleteAfterOperation()
-    val scriptName = downScript(url, workDirName)
-    dataOpt.foreach(data => writeData(data, workDirName))
-    argsOpt.foreach(args => writeData(args, workDirName))
-    val commandSeq: Seq[String] = executor :+ s"${workDirName}/${scriptName}" :+ s"${workDirName}/data.json" :+ s"${workDirName}/args.json"
-    val result = commandSeq.!!
+    executor = executor :+ downScript(url, workDirName)
+
+    if (dataOpt.isDefined) {
+      writeData(dataOpt.get, workDirName)
+      executor = executor :+ (s"${workDirName}/data.json")
+    } else if (argsOpt.isDefined) {
+      writeData(argsOpt.get, workDirName)
+      executor = executor :+ (s"${workDirName}/args.json")
+    }
+
+    val result = executor.!!.trim
     deleteWorkDirFun()
     result
   }

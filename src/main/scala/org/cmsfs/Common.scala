@@ -30,6 +30,10 @@ object Common {
         genConfig(Role_Bootstrap, seed, port, Config_Bootstrap)
       case Service_Format_Script =>
         genConfig(Role_Format_Script, seed, port, Config_Format_Script)
+      case Service_Elastic =>
+        genConfig(Role_Elastic, seed, port, Config_Elastic)
+      case Service_Alarm =>
+        genConfig(Role_Alarm, seed, port, Config_Alarm)
     }
     ActorSystem(ClusterName, config)
   }

@@ -5,23 +5,19 @@ import java.util.Date
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.cluster.ClusterEvent._
 import akka.cluster.{Cluster, Member, MemberStatus}
-import akka.routing.{FromConfig, RoundRobinPool}
 import org.cmsfs.ClusterInfo._
 import org.cmsfs.config.QueryConfig
-import org.cmsfs.config.db.{CoreCollect, CoreConnectorSsh, CoreMonitorDetail}
+import org.cmsfs.config.db.{CoreCollect, CoreConnectorJdbc, CoreConnectorSsh, CoreMonitorDetail}
 import org.cmsfs.servie.bootstrap.BootstrapService.MessageScheduler
-import org.cmsfs.servie.bootstrap.SchedulerActor.{SchedulerCollectLocalScriptMessages, SchedulerCollectSshScriptMessages}
-import org.cmsfs.servie.collect.jdbc.CollectJdbcWorker
-import org.cmsfs.servie.collect.local.script.CollectLocalScriptMessages
+import org.cmsfs.servie.bootstrap.SchedulerActor.{SchedulerCollectJdbc, SchedulerCollectSshScriptMessages}
+import org.cmsfs.servie.collect.jdbc.CollectJdbcMessages
 import org.cmsfs.servie.collect.ssh.script.CollectSshScriptMessages
-import org.cmsfs.servie.collect.ssh.script.CollectSshScriptMessages.Collector
 import org.cmsfs.{ClusterInfo, Common}
 import org.quartz.CronExpression
 
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.util.{Failure, Success}
 
 class BootstrapService extends Actor with ActorLogging {
 
@@ -70,6 +66,7 @@ class BootstrapService extends Actor with ActorLogging {
 
   def schedulerAction() = {
     val cDate = new Date()
+    val utcDate = cDate.toInstant.toString
     QueryConfig.getCoreMonitorDetails.foreach { cmds =>
       val validMonitorDetails: Seq[CoreMonitorDetail] = filterMonitorDetails(cDate)(cmds)
       validMonitorDetails.foreach { md =>
@@ -83,11 +80,25 @@ class BootstrapService extends Actor with ActorLogging {
               for (conn <- conns) {
                 val n_collect = CollectSshScriptMessages.Collector(collect.name, collect.path, collect.args)
                 val n_connector = CollectSshScriptMessages.Connector(conn.name, conn.ip, conn.port, conn.user, conn.password, conn.privateKey)
-                schedulerActor ! SchedulerCollectSshScriptMessages(CollectSshScriptMessages.WorkerJob(collect.name, n_connector, n_collect, "aa"),
+                val map: Map[String, Seq[Int]] = Map("alarm" -> md.formatAlarmIds, "elastic" -> md.formatAnalyzeId.map(Seq(_)).getOrElse(Seq[Int]()))
+                schedulerActor ! SchedulerCollectSshScriptMessages(CollectSshScriptMessages.WorkerJob(md.id.get, collect.name, n_connector, n_collect, utcDate, map),
                   serviceMembers.get(Service_Collect_Ssh_Script).get)
               }
             }
-          //          case "jdbc" =>
+          case "jdbc" =>
+            val f: Future[(CoreCollect, Seq[CoreConnectorJdbc])] = for {
+              collect <- QueryConfig.getCoreCollectById(md.collectId)
+              conns <- Future.sequence(md.connectorIds.map(id => QueryConfig.getCoreConnectorJdbcById(id)))
+            } yield (collect, conns)
+            f.foreach { case (collect, conns) =>
+              for (conn <- conns) {
+                val n_collect = CollectJdbcMessages.Collector(collect.name, collect.path, collect.args)
+                val n_connector = CollectJdbcMessages.Connector(conn.name, conn.url, conn.user, conn.password)
+                val map: Map[String, Seq[Int]] = Map("alarm" -> md.formatAlarmIds, "elastic" -> md.formatAnalyzeId.map(Seq(_)).getOrElse(Seq[Int]()))
+                schedulerActor ! SchedulerCollectJdbc(CollectJdbcMessages.WorkerJob(md.id.get, collect.name, n_connector, n_collect, utcDate, map),
+                  serviceMembers.get(Service_Collect_Jdbc).get)
+              }
+            }
           case _ =>
             println(md.connectorMode)
         }

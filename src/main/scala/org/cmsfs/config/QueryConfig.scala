@@ -32,4 +32,20 @@ object QueryConfig {
     db.run(coreCollects.filter(_.id === id).result.head)
   }
 
+  def getCoreMonitorDetailById(id: Int) = {
+    db.run(coreMonitorDetails.filter(_.id === id).result.head)
+  }
+
+  def getCoreFormatAnalyzesById(id: Int) = {
+    db.run(coreFormatAnalyzes.filter(_.id === id).result.head)
+  }
+
+  def getCoreFormatAlarmsById(id: Int) = {
+    db.run(coreFormatAlarms.filter(_.id === id).result.head)
+  }
+
+  def getCoreConnectorJdbcById(id: Int) = {
+    db.run(coreConnectorJdbcs.filter(_.id === id).result.head)
+  }
+
 }

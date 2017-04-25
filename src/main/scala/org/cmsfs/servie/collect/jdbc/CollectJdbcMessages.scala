@@ -8,6 +8,6 @@ object CollectJdbcMessages {
 
   case class Collector(name: String, path: String, args: Option[String])
 
-  case class WorkerJob(name: String, connect: Connector, collect: Collector, next: String) extends CollectWorkerMessage
+  case class WorkerJob(id: Int, name: String, connect: Connector, collect: Collector, utcDate: String, next: Map[String, Seq[Int]]) extends CollectWorkerMessage
 
 }
