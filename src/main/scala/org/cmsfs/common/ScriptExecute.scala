@@ -102,8 +102,10 @@ object ScriptExecute {
     if (dataOpt.isDefined) {
       writeData(dataOpt.get, workDirName)
       executor = executor :+ (s"${workDirName}/data.json")
-    } else if (argsOpt.isDefined) {
-      writeData(argsOpt.get, workDirName)
+    }
+
+    if (argsOpt.isDefined) {
+      writeArgs(argsOpt.get, workDirName)
       executor = executor :+ (s"${workDirName}/args.json")
     }
 

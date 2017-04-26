@@ -30,7 +30,9 @@ class ElasticSearchWorker extends Actor with ActorLogging {
     wsClient.url(s"http://10.65.103.63:9200/${_index}/${_type}").post(rs).foreach { response =>
       val statusText: String = response.statusText
       processCapacityCalculate -= 1
-      println(s"Got a response $statusText , ${processCapacityCalculate}")
+      if (processCapacityCalculate >= 10) {
+        println(s"Got a response $statusText , ${processCapacityCalculate}")
+      }
     }
   }
 }

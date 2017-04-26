@@ -36,7 +36,9 @@ class CollectSshScriptWorker(serviceMembers: mutable.Map[String, IndexedSeq[Memb
             context.actorSelection(RootActorPath(member.address) / "user" / Service_Format_Script) ! FormatScriptMessages.WorkerJob(rs, job.utcDate, job.connect.name, (mode, id))
           }
         }
-        println(s"CollectSshScriptWorker: ${processCapacityCalculate}")
+        if (processCapacityCalculate >= 10) {
+          println(s"CollectSshScriptWorker: ${processCapacityCalculate}")
+        }
       } else {
         println("format service member less.")
       }

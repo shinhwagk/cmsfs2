@@ -1,6 +1,6 @@
 package org.cmsfs.servie.collect.ssh.script
 
-import java.io.{BufferedReader, InputStreamReader}
+import java.io.{BufferedReader, InputStream, InputStreamReader}
 
 import com.jcraft.jsch.{ChannelExec, JSch}
 import org.cmsfs.common.ScriptExecute
@@ -63,19 +63,29 @@ trait CollectSshScriptWorkerAction {
 
     val exitStatus: Int = channelExec.getExitStatus();
 
-    channelExec.disconnect();
-    session.disconnect();
+    try {
+      if (exitStatus == 0 || exitStatus == -1) {
+        Json.toJson(rs).toString()
+      } else {
+        val err = getAAA(channelExec.getErrStream())
+        throw new Exception(s"ssh ${scriptUrl} error, host:${host}, err: ${err}. data ${Json.toJson(rs).toString()}")
+      }
+    } finally {
+      channelExec.disconnect();
+      session.disconnect();
+    }
+  }
 
-    logger.info(s"stage $exitStatus")
+  def getAAA(in: InputStream) = {
+    val reader = new BufferedReader(new InputStreamReader(in));
+    val rs = new ArrayBuffer[String]()
 
-    //    if (exitStatus < 0) {
-    //      logger.info(s"stage $exitStatus")
-    //      // System.out.println("Done, but exit status not set!");
-    //    } else if (exitStatus > 0) {
-    //      // System.out.println("Done, but with error!");
-    //    } else {
-    //      // System.out.println("Done!");
-    //    }
+    var line: Option[String] = Option(reader.readLine())
+
+    while (line.isDefined) {
+      rs += line.get
+      line = Option(reader.readLine())
+    }
     Json.toJson(rs).toString()
   }
 }

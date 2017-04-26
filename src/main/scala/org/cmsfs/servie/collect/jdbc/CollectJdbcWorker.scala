@@ -19,7 +19,6 @@ class CollectJdbcWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]])
     case job: WorkerJob =>
       val formatMembers = serviceMembers.get(Service_Format_Script).get
       if (formatMembers.length >= 1) {
-        println(s"worker jdbc ${job.name}")
         val f: Future[Option[String]] = collectFun(job.connect, job.collect)
         f.foreach { rs =>
           job.next.foreach { case (mode, ids) =>

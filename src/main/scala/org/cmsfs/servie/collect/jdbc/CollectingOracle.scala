@@ -52,7 +52,6 @@ class CollectingOracle(jdbcUrl: String, username: String, password: String, sqlT
       }
       rows += row.toMap
     }
-    println(rows.toList)
     Json.toJson(rows.toList)
   }
 
