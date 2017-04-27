@@ -17,8 +17,16 @@
       {
         "path": [],
         "apply": [
-          {"ids": [0],     "threshold": "", "notification": {"mails": [], "mobiles": []}},
-          {"ids": [1,2,3], "threshold": "", "notification": {"mails": [], "mobiles": []}}
+          {"ids": [0],     "args":[
+                                    {"threshold": "", "notification": {"mails": [], "mobiles": []}},
+                                    {"threshold": "", "notification": {"mails": [], "mobiles": []}}
+                                  ]
+          },
+          {"ids": [1,2,3], "args":[
+                                    {"threshold": "", "notification": {"mails": [], "mobiles": []}},
+                                    {"threshold": "", "notification": {"mails": [], "mobiles": []}}
+                                  ]
+          }
         ]
       }
     ]
