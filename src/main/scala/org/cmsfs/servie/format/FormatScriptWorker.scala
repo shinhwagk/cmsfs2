@@ -35,14 +35,17 @@ class FormatScriptWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]]
                   val random_index = new Random().nextInt(members.length)
                   val member = members(random_index)
                   alarmContent.foreach { ac =>
-                    context.actorSelection(RootActorPath(member.address) / "user" / Service_Alarm) ! AlarmMessages.WorkerJobForMail(mail, job.dslName, ac.mail)
+                    ac.mail.foreach(m =>
+                      context.actorSelection(RootActorPath(member.address) / "user" / Service_Alarm) ! AlarmMessages.WorkerJobForMail(mail, job.collectName + "/" + job.dslName, m))
                   }
                 }
                 fa.notification.mobiles.foreach { mobile =>
                   val random_index = new Random().nextInt(members.length)
                   val member = members(random_index)
                   alarmContent.foreach { ac =>
-                    context.actorSelection(RootActorPath(member.address) / "user" / Service_Alarm) ! AlarmMessages.WorkerJobForMobile(mobile, ac.mobile)
+                    ac.mobile.foreach(m =>
+                      context.actorSelection(RootActorPath(member.address) / "user" / Service_Alarm) ! AlarmMessages.WorkerJobForMobile(mobile, m)
+                    )
                   }
                 }
               } else {
@@ -57,14 +60,13 @@ class FormatScriptWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]]
           QueryConfig.getCoreFormatAnalyzesById(id).foreach { fa =>
             try {
               val result: String = ScriptExecute.executeScript(fa.path, job.result, None, ScriptExecutorMode.DOWN, false)
-
               val arr: Seq[JsValue] = Json.parse(result).as[JsArray].value
               arr.foreach { rs =>
                 val members = serviceMembers.get(Service_Elastic).get
                 if (members.length >= 1) {
                   val random_index = new Random().nextInt(members.length)
                   val member = members(random_index)
-                  val metaData = ElasticSearchMessage.MetaData(fa._index, job.dslName, fa._metric, job.utcDate, "")
+                  val metaData = ElasticSearchMessage.MetaData(fa._index, job.dslName, fa._metric, job.utcDate, job.dslName)
                   //                val metaData = ElasticSearchMessage.MetaData(fa._index, fa._type, fa._metric, job.utcDate,"")
                   context.actorSelection(RootActorPath(member.address) / "user" / Service_Elastic) ! ElasticSearchMessage.WorkerJob(rs.toString(), metaData)
                 } else {
@@ -84,7 +86,7 @@ object FormatScriptWorker {
   def props(serviceMembers: mutable.Map[String, IndexedSeq[Member]]) = Props(new FormatScriptWorker(serviceMembers))
 }
 
-case class AAAA(mail: String, mobile: String)
+case class AAAA(mail: Option[String], mobile: Option[String])
 
 object AAAA {
   implicit val format: Format[AAAA] = Json.format

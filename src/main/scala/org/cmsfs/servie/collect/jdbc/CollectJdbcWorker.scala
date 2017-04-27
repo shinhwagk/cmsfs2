@@ -25,7 +25,7 @@ class CollectJdbcWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]])
             ids.foreach { id =>
               val random_index = new Random().nextInt(formatMembers.length)
               val member = formatMembers(random_index)
-              context.actorSelection(RootActorPath(member.address) / "user" / Service_Format_Script) ! FormatScriptMessages.WorkerJob(rs, job.utcDate, job.connect.name, (mode, id))
+              context.actorSelection(RootActorPath(member.address) / "user" / Service_Format_Script) ! FormatScriptMessages.WorkerJob(job.collect.name,rs, job.utcDate, job.connect.name, (mode, id))
             }
           }
         }

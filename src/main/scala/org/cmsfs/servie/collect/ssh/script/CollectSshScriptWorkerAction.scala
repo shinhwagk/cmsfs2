@@ -23,8 +23,7 @@ trait CollectSshScriptWorkerAction {
         // test
         Some(ssh("C:\\Users\\zhangxu\\.ssh\\id_rsa", user, host, scriptUrl, port));
       } else if (OSName == "linux") {
-        Some("xxxx")
-        //        Some(ssh("~/.ssh/id_rsa", user, host, scriptUrl, port));
+        Some(ssh("~/.ssh/id_rsa", user, host, scriptUrl, port));
       } else {
         logger.error("OS not match..");
         None
