@@ -1,4 +1,5 @@
 {
+	"cron", "0 * * * * * ?",
 	"mode": "ssh",
 	"connector": [1,2,3],
 	"path": ["oracle", "common", "tablespace_space", "collect.sql"],
