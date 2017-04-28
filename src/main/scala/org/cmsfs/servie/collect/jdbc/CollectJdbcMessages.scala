@@ -10,4 +10,6 @@ object CollectJdbcMessages {
 
   case class WorkerJob(id: Int, name: String, connect: Connector, collect: Collector, utcDate: String, next: Map[String, Seq[Int]]) extends CollectWorkerMessage
 
+  case class WorkerJobNew(connect: Connector, collect: Collector, env: String)
+
 }

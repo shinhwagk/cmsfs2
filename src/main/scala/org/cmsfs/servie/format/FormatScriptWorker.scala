@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorLogging, Props, RootActorPath}
 import akka.cluster.Member
 import org.cmsfs.ClusterInfo._
 import org.cmsfs.common.{ScriptExecute, ScriptExecutorMode}
-import org.cmsfs.config.QueryConfig
+import org.cmsfs.config.db.QueryConfig
 import org.cmsfs.servie.alarm.AlarmMessages
 import org.cmsfs.servie.elasticsearch.ElasticSearchMessage
 import org.cmsfs.servie.format.FormatScriptMessages.WorkerJob

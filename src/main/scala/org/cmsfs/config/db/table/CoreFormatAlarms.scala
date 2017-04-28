@@ -1,4 +1,4 @@
-package org.cmsfs.config.db
+package org.cmsfs.config.db.table
 
 import play.api.libs.json.{Format, Json}
 import slick.jdbc.MySQLProfile.api._

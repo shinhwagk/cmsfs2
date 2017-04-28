@@ -1,6 +1,6 @@
-package org.cmsfs.config
+package org.cmsfs.config.db
 
-import org.cmsfs.config.db._
+import org.cmsfs.config.db.table._
 import slick.jdbc.MySQLProfile.api._
 
 import scala.concurrent.Future
@@ -19,6 +19,10 @@ object QueryConfig {
   private val coreFormatAlarms = TableQuery[CoreFormatAlarms]
 
   private val coreFormatAnalyzes = TableQuery[CoreFormatAnalyzes]
+
+  private val coreCmsfs = TableQuery[CoreCmsfs]
+
+  private val coreCmsfsDetails = TableQuery[CoreCmsfsDetails]
 
   def getCoreMonitorDetails: Future[Seq[CoreMonitorDetail]] = {
     db.run(coreMonitorDetails.result)
@@ -46,6 +50,14 @@ object QueryConfig {
 
   def getCoreConnectorJdbcById(id: Int) = {
     db.run(coreConnectorJdbcs.filter(_.id === id).result.head)
+  }
+
+  def getCoreCmsfsById(id: Int) = {
+    db.run(coreCmsfs.filter(_.id === id).result.head)
+  }
+
+  def getCoreCmsfsDetails = {
+    db.run(coreCmsfsDetails.result)
   }
 
 }

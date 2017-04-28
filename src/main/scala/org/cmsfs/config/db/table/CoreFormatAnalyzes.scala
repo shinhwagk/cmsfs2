@@ -1,4 +1,4 @@
-package org.cmsfs.config.db
+package org.cmsfs.config.db.table
 
 import slick.jdbc.MySQLProfile.api._
 

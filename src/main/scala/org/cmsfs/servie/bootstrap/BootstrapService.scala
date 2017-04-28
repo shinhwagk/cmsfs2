@@ -6,8 +6,8 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.cluster.ClusterEvent._
 import akka.cluster.{Cluster, Member, MemberStatus}
 import org.cmsfs.ClusterInfo._
-import org.cmsfs.config.QueryConfig
-import org.cmsfs.config.db.{CoreCollect, CoreConnectorJdbc, CoreConnectorSsh, CoreMonitorDetail}
+import org.cmsfs.config.db._
+import org.cmsfs.config.db.table.{CoreCollect, CoreConnectorJdbc, CoreConnectorSsh, CoreMonitorDetail}
 import org.cmsfs.servie.bootstrap.BootstrapService.MessageScheduler
 import org.cmsfs.servie.bootstrap.SchedulerActor.{SchedulerCollectJdbc, SchedulerCollectSshScriptMessages}
 import org.cmsfs.servie.collect.jdbc.CollectJdbcMessages
