@@ -5,9 +5,6 @@ import akka.cluster.{Cluster, Member}
 import akka.cluster.ClusterEvent._
 import org.cmsfs.ClusterInfo._
 import org.cmsfs.Common
-import org.cmsfs.servie.collect.jdbc.CollectJdbcMessages
-import org.cmsfs.servie.collect.local.script.CollectLocalScriptMessages
-import org.cmsfs.servie.collect.ssh.script.CollectSshScriptMessages
 
 import scala.collection.mutable
 
@@ -21,7 +18,7 @@ trait CollectActorCore extends Actor with ActorLogging {
 
   override def postStop(): Unit = cluster.unsubscribe(self)
 
-  val memberNames = Service_Format_Script :: Nil
+  val memberNames = Service_Process :: Nil
 
   val serviceMembers = Common.initNeedServices(memberNames)
 
@@ -34,13 +31,7 @@ trait CollectActorCore extends Actor with ActorLogging {
       Common.unRegisterMember(member, serviceMembers)
     case MemberRemoved(member, previousStatus) =>
       log.info("Member is Removed: {} after {}", member.address, previousStatus)
-    case workerMessage: CollectWorkerMessage =>
-      workerMessage match {
-        case mgs: CollectLocalScriptMessages.WorkerJob => worker ! mgs
-        case mgs: CollectSshScriptMessages.WorkerJob => worker ! mgs
-        case mgs: CollectJdbcMessages.WorkerJob => worker ! mgs
-        case _ => ???
-      }
+    case msg: CollectorWorkerMessage.WorkerJob => worker ! msg
     case _: MemberEvent => // ignore
   }
 }

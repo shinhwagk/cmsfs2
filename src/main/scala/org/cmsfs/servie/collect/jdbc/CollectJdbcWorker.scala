@@ -1,15 +1,14 @@
 package org.cmsfs.servie.collect.jdbc
 
-import akka.actor.{Actor, ActorLogging, Props, RootActorPath}
+import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.Member
-import org.cmsfs.ClusterInfo.Service_Format_Script
 import org.cmsfs.common.ScriptExecute
-import org.cmsfs.servie.collect.jdbc.CollectJdbcMessages.WorkerJob
-import org.cmsfs.servie.format.FormatScriptMessages
+import org.cmsfs.servie.collect.Collector
+import org.cmsfs.servie.collect.Collector.Collector
+import org.cmsfs.servie.collect.CollectorWorkerMessage.WorkerJob
 
 import scala.collection.mutable
 import scala.concurrent.Future
-import scala.util.Random
 
 class CollectJdbcWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]]) extends Actor with ActorLogging {
 
@@ -17,27 +16,29 @@ class CollectJdbcWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]])
 
   override def receive: Receive = {
     case job: WorkerJob =>
-      val formatMembers = serviceMembers.get(Service_Format_Script).get
-      if (formatMembers.length >= 1) {
-        val f: Future[Option[String]] = collectFun(job.connect, job.collect)
-        f.foreach { rs =>
-          job.next.foreach { case (mode, ids) =>
-            ids.foreach { id =>
-              val random_index = new Random().nextInt(formatMembers.length)
-              val member = formatMembers(random_index)
-              context.actorSelection(RootActorPath(member.address) / "user" / Service_Format_Script) ! FormatScriptMessages.WorkerJob(job.collect.name,rs, job.utcDate, job.connect.name, (mode, id))
-            }
-          }
-        }
-      } else {
-        println("format service member less.")
-      }
+//      val x: Collector = Collector.executeCollect(job.config)
+//
+//      val formatMembers = serviceMembers.get(Service_Format_Script).get
+//      if (formatMembers.length >= 1) {
+//        val f: Future[Option[String]] = collectFun(job.connect, job.collect)
+//        f.foreach { rs =>
+//          job.next.foreach { case (mode, ids) =>
+//            ids.foreach { id =>
+//              val random_index = new Random().nextInt(formatMembers.length)
+//              val member = formatMembers(random_index)
+//              context.actorSelection(RootActorPath(member.address) / "user" / Service_Format_Script) ! ProcessMessages.WorkerJob(job.collect.name,rs, job.utcDate, job.connect.name, (mode, id))
+//            }
+//          }
+//        }
+//      } else {
+//        println("format service member less.")
+//      }
   }
 
-  def collectFun(cr: CollectJdbcMessages.Connector, ct: CollectJdbcMessages.Collector): Future[Option[String]] = {
-    val sqlText = ScriptExecute.getUrlContentByPath(ct.path)
-    collectAction(cr.jdbcUrl, cr.user, cr.password, sqlText, Nil)
-  }
+//  def collectFun(cr: CollectJdbcMessages.Connector, ct: CollectJdbcMessages.Collector): Future[Option[String]] = {
+//    val sqlText = ScriptExecute.getUrlContentByPath(ct.path)
+//    collectAction(cr.jdbcUrl, cr.user, cr.password, sqlText, Nil)
+//  }
 
   def collectAction(jdbcUrl: String, user: String, password: String, sqlText: String, parameters: Seq[String]): Future[Option[String]] = {
     val DBTYPE = "oracle"

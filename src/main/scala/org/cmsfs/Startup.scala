@@ -1,12 +1,10 @@
 package org.cmsfs
 
-import org.cmsfs.servie.alarm.AlarmService
 import org.cmsfs.servie.bootstrap.BootstrapService
 import org.cmsfs.servie.collect.jdbc.CollectJdbcService
-import org.cmsfs.servie.collect.local.script.CollectLocalScriptService
-import org.cmsfs.servie.collect.ssh.script.CollectSshScriptService
-import org.cmsfs.servie.elasticsearch.ElasticSearchService
-import org.cmsfs.servie.format.FormatScriptService
+import org.cmsfs.servie.collect.local.CollectLocalScriptService
+import org.cmsfs.servie.collect.ssh.SshCollectService
+import org.cmsfs.servie.process.ProcessService
 
 object Startup {
   def main(args: Array[String]): Unit = {
@@ -30,15 +28,11 @@ object Startup {
       case Service_Collect_Local_Script =>
         CollectLocalScriptService.main(args)
       case Service_Collect_Ssh_Script =>
-        CollectSshScriptService.main(args)
+        SshCollectService.main(args)
       case Service_Collect_Jdbc =>
         CollectJdbcService.main(args)
-      case Service_Format_Script =>
-        FormatScriptService.main(args)
-      case Service_Elastic =>
-        ElasticSearchService.main(args)
-      case Service_Alarm =>
-        AlarmService.main(args)
+      case Service_Process =>
+        ProcessService.main(args)
       case _ =>
         println(s"startup service: ${service} no exist.")
         System.exit(1)

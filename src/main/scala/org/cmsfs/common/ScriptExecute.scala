@@ -66,7 +66,7 @@ object ScriptExecute {
     }
   }
 
-  def executeScript(path: String, data: Option[String], args: Option[String], executeMode: ScriptExecuteMode, resultToArrayByLine: Boolean): String = {
+  def executeScript(path: String, data: Option[String], args: Option[String], env: String, executeMode: ScriptExecuteMode, resultToArrayByLine: Boolean): String = {
     val url = getUrlByPath(path)
     val rs = executeMode match {
       case ScriptExecutorMode.ONLINE =>

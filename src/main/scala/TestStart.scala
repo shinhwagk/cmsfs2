@@ -7,12 +7,8 @@ object TestStart {
     Thread.sleep(1000)
     Startup.main(Seq(Service_Collect_Ssh_Script, "2765", "127.0.0.1:2579").toArray)
     Thread.sleep(1000)
-    Startup.main(Seq(Service_Format_Script, "2769", "127.0.0.1:2579").toArray)
+    Startup.main(Seq(Service_Process, "2769", "127.0.0.1:2579").toArray)
     Thread.sleep(1000)
     Startup.main(Seq(Service_Collect_Jdbc, "2771", "127.0.0.1:2579").toArray)
-    Thread.sleep(1000)
-    Startup.main(Seq(Service_Elastic, "2770", "127.0.0.1:2579").toArray)
-    Thread.sleep(1000)
-    Startup.main(Seq(Service_Alarm, "2772", "127.0.0.1:2579").toArray)
   }
 }
