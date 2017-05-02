@@ -1,6 +1,6 @@
 package org.cmsfs.servie.collect
 
-import org.cmsfs.config.db.table.{ConfTask, ConfTaskSchema}
+import org.cmsfs.config.db.table.ConfTaskSchema
 
 object CollectorServiceMessage {
 

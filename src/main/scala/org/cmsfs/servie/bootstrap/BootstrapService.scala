@@ -10,26 +10,34 @@ import org.cmsfs.{ClusterInfo, Common}
 import org.quartz.CronExpression
 
 import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
 class BootstrapService extends Actor with ActorLogging {
 
   import context.dispatcher
 
-  val schedulerActor: ActorRef = context.actorOf(CollectorService.props, "scheduler")
+  val collectServiceActor: ActorRef = context.actorOf(CollectorService.props, "collect-service")
 
-  def schedulerAction() = {
+  override def receive: Receive = {
+    case MessageScheduler => {
+      log.info(s"scheduler ${System.currentTimeMillis()}")
+      schedulerAction
+    }
+  }
+
+  def schedulerAction = {
     implicit val cDate = new Date()
-    QueryConfig.getConfTasks.foreach(_.filter(d => filterCron(d.cron)).foreach(task => schedulerActor !
-      CollectorServiceMessage.WorkerJob(task.schema, cDate.toInstant.toString)))
+    QueryConfig.getConfBootstrap onComplete {
+      case Success(bootstrap) =>
+        bootstrap.filter(d => filterCron(d.cron)).foreach { task =>
+          collectServiceActor ! CollectorServiceMessage.WorkerJob(task.schema, cDate.toInstant.toString)
+        }
+      case Failure(ex) => log.error(ex.getMessage)
+    }
   }
 
   def filterCron(cron: String)(implicit cDate: Date): Boolean = {
     new CronExpression(cron).isSatisfiedBy(cDate)
-  }
-
-  override def receive: Receive = {
-    case MessageScheduler =>
-      schedulerAction()
   }
 }
 

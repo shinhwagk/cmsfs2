@@ -14,7 +14,7 @@ object CollectLocalScriptService {
   def main(args: Array[String]): Unit = {
     val seed = args(0)
     val port = args(1)
-    val system = Common.genActorSystem(Service_Collect_Local_Script, seed, port)
-    system.actorOf(Props[CollectLocalScriptService], name = Actor_Collect_Local_Script)
+    val system = Common.genActorSystem(Service_Collect_Local, seed, port)
+    system.actorOf(Props[CollectLocalScriptService], name = Actor_Collect_Local)
   }
 }

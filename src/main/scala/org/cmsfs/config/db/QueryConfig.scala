@@ -8,17 +8,17 @@ import scala.concurrent.Future
 object QueryConfig {
   private val db = Database.forConfig("cmsfs-config")
 
-  private val coreConnectorJdbcs = TableQuery[CoreConnectorJdbcs]
+  private val coreConnectorJdbcs = TableQuery[CoreConnectJdbcs]
 
-  private val coreConnectorSshs = TableQuery[CoreConnectorSshs]
+  private val coreConnectorSshs = TableQuery[CoreConnectSshs]
 
   private val coreCollects = TableQuery[CoreCollects]
 
   private val coreProcesses = TableQuery[CoreProcesses]
 
-  private val confTasks = TableQuery[ConfTasks]
+  private val confBootstrap = TableQuery[ConfBootstraps]
 
-  def getCoreConnectorSshById(id: Int): Future[CoreConnectorSsh] = {
+  def getCoreConnectorSshById(id: Int): Future[CoreConnectSsh] = {
     db.run(coreConnectorSshs.filter(_.id === id).result.head)
   }
 
@@ -34,7 +34,7 @@ object QueryConfig {
     db.run(coreProcesses.filter(_.id === id).result.head)
   }
 
-  def getConfTasks = {
-    db.run(confTasks.result)
+  def getConfBootstrap = {
+    db.run(confBootstrap.result)
   }
 }

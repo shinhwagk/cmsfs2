@@ -1,14 +1,15 @@
 package org.cmsfs.servie.collect
 
+import org.cmsfs.config.db.table.{CoreConnectJdbc, CoreConnectSsh}
 import org.cmsfs.servie.collect.ssh.SshCollectWorkerAction
 import play.api.libs.json.{Format, Json}
 
 object Collector extends
   SshCollectWorkerAction {
 
-  case class CollectConfig(path: String, files: Seq[String], args: Option[String])
+  case class CollectConfig(files: Seq[Seq[String]], args: Option[String])
 
-  case class CollectorEnv(utcDate: String,collectName:String, connectName: Option[String]=None)
+  case class CollectorEnv(utcDate: String, collectName: String, connectName: Option[String] = None)
 
   object CollectorEnv {
     implicit val format: Format[CollectorEnv] = Json.format
@@ -16,27 +17,32 @@ object Collector extends
 
   sealed trait CollectorConfig
 
-  case class JdbcCollectorConfig(connect: JdbcConnect, collect: CollectConfig, env: CollectorEnv)
+  case class JdbcCollectorConfig(connect: CoreConnectJdbc, collect: CollectConfig, env: CollectorEnv)
     extends CollectorConfig
 
-  case class SshCollectorConfig(connect: SshConnect, collect: CollectConfig, env: CollectorEnv)
+  case class SshCollectorConfig(connect: CoreConnectSsh, collect: CollectConfig, env: CollectorEnv)
     extends CollectorConfig
 
   case class LocalCollectorConfig(collect: CollectConfig, env: CollectorEnv)
     extends CollectorConfig
 
-  type Collector = () => String
+  type Collector = () => Option[String]
 
   private def sshCollector(config: SshCollectorConfig): Collector = {
-    () => executeScriptBySsh("", 11, "", "").get
+    val ip = config.connect.ip
+    val port = config.connect.port
+    val user = config.connect.user
+    val file = config.collect.files(0)
+    () => executeScriptBySsh(ip, port, user, file)
   }
 
   private def jdbcCollector(config: JdbcCollectorConfig): Collector = {
-    () => executeScriptBySsh("", 11, "", "").get
+    val sqlFile = config.collect.files(0)
+    () => executeScriptBySsh("", 11, "", Seq(""))
   }
 
   private def localCollector(config: LocalCollectorConfig): Collector = {
-    () => ""
+    () => Some("")
   }
 
   def executeCollect(config: CollectorConfig): Collector = {

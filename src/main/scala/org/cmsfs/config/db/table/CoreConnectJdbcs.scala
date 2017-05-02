@@ -2,9 +2,9 @@ package org.cmsfs.config.db.table
 
 import slick.jdbc.MySQLProfile.api._
 
-case class CoreConnectorJdbc(id: Option[Int], name: String, ip: String, port: Int, service: String, user: String, password: String)
+case class CoreConnectJdbc(id: Option[Int], name: String, ip: String, port: Int, service: String, user: String, password: String)
 
-class CoreConnectorJdbcs(tag: Tag) extends Table[CoreConnectorJdbc](tag, "core_connector_jdbc") {
+class CoreConnectJdbcs(tag: Tag) extends Table[CoreConnectJdbc](tag, "core_connect_jdbc") {
 
   def id = column[Option[Int]]("ID", O.PrimaryKey, O.AutoInc)
 
@@ -20,5 +20,5 @@ class CoreConnectorJdbcs(tag: Tag) extends Table[CoreConnectorJdbc](tag, "core_c
 
   def password = column[String]("PASSWORD")
 
-  override def * = (id, name, ip, port, service, user, password) <> (CoreConnectorJdbc.tupled, CoreConnectorJdbc.unapply)
+  override def * = (id, name, ip, port, service, user, password) <> (CoreConnectJdbc.tupled, CoreConnectJdbc.unapply)
 }

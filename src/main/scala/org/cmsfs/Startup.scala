@@ -25,9 +25,9 @@ object Startup {
     service match {
       case Service_Bootstrap =>
         BootstrapService.main(args)
-      case Service_Collect_Local_Script =>
+      case Service_Collect_Local =>
         CollectLocalScriptService.main(args)
-      case Service_Collect_Ssh_Script =>
+      case Service_Collect_Ssh =>
         SshCollectService.main(args)
       case Service_Collect_Jdbc =>
         CollectJdbcService.main(args)

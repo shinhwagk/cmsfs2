@@ -12,8 +12,8 @@ import scala.collection.mutable.ArrayBuffer
 trait SshCollectWorkerAction {
   val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  def executeScriptBySsh(ip: String, port: Int, user: String, path: String): Option[String] = {
-    collectAction(ip, user, ScriptExecute.getUrlByPath(path), port)
+  def executeScriptBySsh(ip: String, port: Int, user: String, file: Seq[String]): Option[String] = {
+    collectAction(ip, user, ScriptExecute.getUrlByPath(file), port)
   }
 
   def collectAction(host: String, user: String, scriptUrl: String, port: Int = 22): Option[String] = {

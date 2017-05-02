@@ -14,7 +14,7 @@ object SshCollectService {
   def main(args: Array[String]): Unit = {
     val seed = args(0)
     val port = args(1)
-    val system = Common.genActorSystem(Service_Collect_Ssh_Script, seed, port)
-    system.actorOf(Props[SshCollectService], name = Actor_Collect_Ssh_Script)
+    val system = Common.genActorSystem(Service_Collect_Ssh, seed, port)
+    system.actorOf(Props[SshCollectService], name = Actor_Collect_Ssh)
   }
 }

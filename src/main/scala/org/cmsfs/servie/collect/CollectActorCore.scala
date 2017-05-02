@@ -1,12 +1,10 @@
 package org.cmsfs.servie.collect
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
-import akka.cluster.{Cluster, Member}
+import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import org.cmsfs.ClusterInfo._
 import org.cmsfs.Common
-
-import scala.collection.mutable
 
 trait CollectActorCore extends Actor with ActorLogging {
   val cluster = Cluster(context.system)
@@ -14,7 +12,7 @@ trait CollectActorCore extends Actor with ActorLogging {
   val worker: ActorRef;
 
   override def preStart(): Unit =
-    cluster.subscribe(self, classOf[MemberUp], classOf[MemberJoined], classOf[MemberEvent], classOf[UnreachableMember], classOf[MemberRemoved])
+    cluster.subscribe(self, classOf[MemberUp], classOf[UnreachableMember])
 
   override def postStop(): Unit = cluster.unsubscribe(self)
 

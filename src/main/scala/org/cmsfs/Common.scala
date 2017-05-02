@@ -20,10 +20,10 @@ object Common {
 
   def genActorSystem(service: String, seed: String, port: String): ActorSystem = {
     val config = service match {
-      case Service_Collect_Local_Script =>
-        genConfig(Role_Collect_Script_Local, seed, port, Config_Collect_Script_Local)
-      case Service_Collect_Ssh_Script =>
-        genConfig(Role_Collect_Ssh_Script, seed, port, Config_Collect_Ssh_Script)
+      case Service_Collect_Local =>
+        genConfig(Role_Collect_Local, seed, port, Config_Collect_Script)
+      case Service_Collect_Ssh =>
+        genConfig(Role_Collect_Ssh, seed, port, Config_Collect_Ssh)
       case Service_Collect_Jdbc =>
         genConfig(Role_Collect_Jdbc, seed, port, Config_Collect_Jdbc)
       case Service_Bootstrap =>

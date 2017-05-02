@@ -17,15 +17,15 @@ object ScriptExecute {
 
   private val formatUrl: String = ConfigFactory.load().getString("cmsfs.url")
 
-  def getUrlByPath(path: String): String = {
-    formatUrl :: Json.parse(path).as[List[String]] mkString "/"
+  def getUrlByPath(path: Seq[String]): String = {
+    formatUrl +: path mkString "/"
   }
 
-  def getUrlContentByPath(path: String): String = {
+  def getUrlContentByPath(path: Seq[String]): String = {
     Source.fromURL(getUrlByPath(path), "UTF-8").mkString.trim
   }
 
-  private def createWorkDirAndDeleteAfterOperation(): (String, () => Unit) = {
+  private def createWorkDirAndDeleteAfterExecute(): (String, () => Unit) = {
     val dirName = s"workspace/${ThreadLocalRandom.current.nextLong(100000000).toString}"
     val dir = new File(dirName)
     FileUtils.forceMkdir(dir)
@@ -41,6 +41,13 @@ object ScriptExecute {
 
   private def downScript(url: String, dirPath: String): String = {
     val scriptName = url.split("/").last
+    FileUtils.copyURLToFile(new URL(url), new File(dirPath + "/" + scriptName))
+    dirPath + "/" + scriptName
+  }
+
+  private def downScript(file: Seq[String], dirPath: String): String = {
+    val url = getUrlByPath(file)
+    val scriptName = file.last
     FileUtils.copyURLToFile(new URL(url), new File(dirPath + "/" + scriptName))
     dirPath + "/" + scriptName
   }
@@ -66,18 +73,19 @@ object ScriptExecute {
     }
   }
 
-  def executeScript(path: String, data: Option[String], args: Option[String], env: String, executeMode: ScriptExecuteMode, resultToArrayByLine: Boolean): String = {
-    val url = getUrlByPath(path)
+  def executeScript(files: Seq[Seq[String]], env: String, data: Option[String], args: Option[String], executeMode: ScriptExecuteMode, resultToArrayByLine: Boolean): String = {
+    val url = getUrlByPath(files(0))
     val rs = executeMode match {
       case ScriptExecutorMode.ONLINE =>
-        executeScriptForOnline(url, data, args)
+        executeScriptForOnline(files, data, args)
       case ScriptExecutorMode.DOWN =>
-        executeScriptForDown(url, data, args)
+        executeScriptForDown(files, data, args)
     }
     if (resultToArrayByLine) rs.split("\n").map(_.trim).mkString("[\"", "\",\"", "\"]") else rs.trim
   }
 
-  private def executeScriptForOnline(url: String, data: Option[String], args: Option[String]): String = {
+  private def executeScriptForOnline(files: Seq[Seq[String]], data: Option[String], args: Option[String]): String = {
+    val url = getUrlByPath(files(0))
     import sys.process._
     val executor: Seq[String] = executorChoice(url, ScriptExecutorMode.ONLINE)
     if (data.isDefined) {
@@ -89,15 +97,18 @@ object ScriptExecute {
           Seq("curl", "-sk", url) #| executor !!
       }
     } else {
-      executeScriptForDown(url, data, args)
+      executeScriptForDown(files, data, args)
     }
   }
 
-  private def executeScriptForDown(url: String, dataOpt: Option[String], argsOpt: Option[String]): String = {
+  private def executeScriptForDown(files: Seq[Seq[String]], dataOpt: Option[String], argsOpt: Option[String]): String = {
     import sys.process._
-    var executor: Seq[String] = executorChoice(url, ScriptExecutorMode.DOWN)
-    val (workDirName, deleteWorkDirFun) = createWorkDirAndDeleteAfterOperation()
-    executor = executor :+ downScript(url, workDirName)
+    var executor: Seq[String] = executorChoice(files(0).last, ScriptExecutorMode.DOWN)
+    val (workDirName, deleteWorkDirFun) = createWorkDirAndDeleteAfterExecute()
+
+    files.foreach(downScript(_, workDirName))
+
+    executor = executor :+ files(0).last
 
     if (dataOpt.isDefined) {
       writeData(dataOpt.get, workDirName)
