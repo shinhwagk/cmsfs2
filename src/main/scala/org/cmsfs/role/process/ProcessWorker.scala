@@ -1,9 +1,9 @@
-package org.cmsfs.servie.process
+package org.cmsfs.role.process
 
 import akka.actor.{Actor, ActorLogging, Props}
 import org.cmsfs.config.db.QueryConfig
-import org.cmsfs.servie.process.ProcessMessages.WorkerJob
-import org.cmsfs.servie.process.Processor.{ProcessConfig, ProcessorConfig}
+import org.cmsfs.role.process.ProcessMessages.WorkerJob
+import org.cmsfs.role.process.Processor.{ProcessConfig, ProcessorConfig}
 
 class ProcessorWorker extends Actor with ActorLogging {
   println("ProcessWorker start.")

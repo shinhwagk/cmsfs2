@@ -1,7 +1,7 @@
-package org.cmsfs.servie.collect
+package org.cmsfs.role.collect
 
 import org.cmsfs.config.db.table.{CoreConnectJdbc, CoreConnectSsh}
-import org.cmsfs.servie.collect.ssh.SshCollectWorkerAction
+import org.cmsfs.role.collect.ssh.SshCollectWorkerAction
 import play.api.libs.json.{Format, Json}
 
 object Collector extends

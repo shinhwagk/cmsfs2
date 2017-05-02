@@ -1,11 +1,11 @@
-package org.cmsfs.servie.bootstrap
+package org.cmsfs.role.bootstrap
 
 import java.util.Date
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import org.cmsfs.config.db._
-import org.cmsfs.servie.bootstrap.BootstrapService.MessageScheduler
-import org.cmsfs.servie.collect.{CollectorService, CollectorServiceMessage}
+import org.cmsfs.role.bootstrap.BootstrapService.MessageScheduler
+import org.cmsfs.role.collect.{CollectorService, CollectorServiceMessage}
 import org.cmsfs.{ClusterInfo, Common}
 import org.quartz.CronExpression
 

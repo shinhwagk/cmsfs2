@@ -1,4 +1,4 @@
-package org.cmsfs.servie.collect
+package org.cmsfs.role.collect
 
 import akka.actor.{Actor, ActorLogging, Props, RootActorPath}
 import akka.cluster.ClusterEvent._
@@ -6,7 +6,7 @@ import akka.cluster.{Cluster, Member, MemberStatus}
 import org.cmsfs.ClusterInfo._
 import org.cmsfs.Common
 import org.cmsfs.config.db.QueryConfig
-import org.cmsfs.servie.collect.Collector.{CollectConfig, CollectorEnv}
+import org.cmsfs.role.collect.Collector.{CollectConfig, CollectorEnv}
 
 import scala.collection.mutable
 import scala.util.{Failure, Success}

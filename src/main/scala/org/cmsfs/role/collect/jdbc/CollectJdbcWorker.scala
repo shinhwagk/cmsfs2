@@ -1,11 +1,11 @@
-package org.cmsfs.servie.collect.jdbc
+package org.cmsfs.role.collect.jdbc
 
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.Member
 import org.cmsfs.common.ScriptExecute
-import org.cmsfs.servie.collect.Collector
-import org.cmsfs.servie.collect.Collector.Collector
-import org.cmsfs.servie.collect.CollectorWorkerMessage.WorkerJob
+import org.cmsfs.role.collect.Collector
+import org.cmsfs.role.collect.Collector.Collector
+import org.cmsfs.role.collect.CollectorWorkerMessage.WorkerJob
 
 import scala.collection.mutable
 import scala.concurrent.Future

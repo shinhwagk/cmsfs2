@@ -1,4 +1,4 @@
-package org.cmsfs.servie.collect
+package org.cmsfs.role.collect
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.cluster.Cluster

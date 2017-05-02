@@ -1,7 +1,7 @@
-package org.cmsfs.servie.collect
+package org.cmsfs.role.collect
 
 import org.cmsfs.config.db.table.ConfTaskSchema
-import org.cmsfs.servie.collect.Collector.{CollectConfig, CollectorEnv}
+import org.cmsfs.role.collect.Collector.{CollectConfig, CollectorEnv}
 
 object CollectorWorkerMessage {
 

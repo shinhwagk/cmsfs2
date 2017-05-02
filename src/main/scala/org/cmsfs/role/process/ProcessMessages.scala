@@ -1,7 +1,7 @@
-package org.cmsfs.servie.process
+package org.cmsfs.role.process
 
 import org.cmsfs.config.db.table.ConfTaskProcess
-import org.cmsfs.servie.collect.Collector.CollectorEnv
+import org.cmsfs.role.collect.Collector.CollectorEnv
 
 object ProcessMessages {
 

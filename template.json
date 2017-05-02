@@ -7,7 +7,35 @@
   "porcesses": [
     {
       "id": 1,
-      "args": {"threshold":"80","mails":["191631513@qq.com"]}
+      "name": "proc_alarm_mail",
+      "args": {
+        "threshold": "80"
+      },
+      "services": [
+        {
+          "id": 1,
+          "name":"alarm",
+          "args": {
+            "mails":[]
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "proc_es",
+      "args": {
+      },
+      "services": [
+        {
+          "id": 1,
+          "name":"es",
+          "args": {
+            "_index":"x",
+            "_type":"ddd"
+          }
+        }
+      ]
     }
   ]
 }

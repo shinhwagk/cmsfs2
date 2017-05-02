@@ -1,7 +1,7 @@
-package org.cmsfs.servie.collect.local
+package org.cmsfs.role.collect.local
 
 import akka.actor.{Actor, ActorLogging, Props}
-import org.cmsfs.servie.collect.CollectorWorkerMessage.WorkerJob
+import org.cmsfs.role.collect.CollectorWorkerMessage.WorkerJob
 
 class CollectScriptLocalWorker extends Actor with ActorLogging {
   override def receive: Receive = {

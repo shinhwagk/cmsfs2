@@ -1,4 +1,4 @@
-package org.cmsfs.servie.collect.jdbc
+package org.cmsfs.role.collect.jdbc
 
 import java.sql.{DriverManager, ResultSet}
 

@@ -1,4 +1,4 @@
-package org.cmsfs.servie.collect.ssh
+package org.cmsfs.role.collect.ssh
 
 import java.io.{BufferedReader, InputStream, InputStreamReader}
 

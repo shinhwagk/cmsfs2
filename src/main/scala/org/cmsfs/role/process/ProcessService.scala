@@ -1,4 +1,4 @@
-package org.cmsfs.servie.process
+package org.cmsfs.role.process
 
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.cluster.Cluster

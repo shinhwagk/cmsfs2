@@ -1,7 +1,7 @@
-package org.cmsfs.servie.process
+package org.cmsfs.role.process
 
 import org.cmsfs.common.{ScriptExecute, ScriptExecutorMode}
-import org.cmsfs.servie.collect.Collector.CollectorEnv
+import org.cmsfs.role.collect.Collector.CollectorEnv
 import play.api.libs.json.{JsValue, Json}
 
 object Processor {

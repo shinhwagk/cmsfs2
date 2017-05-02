@@ -1,11 +1,11 @@
-package org.cmsfs.servie.collect.ssh
+package org.cmsfs.role.collect.ssh
 
 import akka.actor.{Actor, ActorLogging, Props, RootActorPath}
 import akka.cluster.Member
 import org.cmsfs.config.db.QueryConfig
-import org.cmsfs.servie.collect.{Collector, CollectorWorkerMessage}
-import org.cmsfs.servie.collect.CollectorWorkerMessage.WorkerJob
-import org.cmsfs.servie.process.ProcessMessages
+import org.cmsfs.role.collect.{Collector, CollectorWorkerMessage}
+import org.cmsfs.role.collect.CollectorWorkerMessage.WorkerJob
+import org.cmsfs.role.process.ProcessMessages
 import org.cmsfs.ClusterInfo._
 
 import scala.collection.mutable

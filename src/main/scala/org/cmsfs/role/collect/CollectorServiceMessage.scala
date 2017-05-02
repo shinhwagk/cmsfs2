@@ -1,4 +1,4 @@
-package org.cmsfs.servie.collect
+package org.cmsfs.role.collect
 
 import org.cmsfs.config.db.table.ConfTaskSchema
 

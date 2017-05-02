@@ -1,10 +1,10 @@
-package org.cmsfs.servie.collect.jdbc
+package org.cmsfs.role.collect.jdbc
 
 import akka.actor.{ActorRef, Props}
 import akka.routing.FromConfig
 import org.cmsfs.Common
 import org.cmsfs.ClusterInfo.{Actor_Collect_Jdbc, Service_Collect_Jdbc}
-import org.cmsfs.servie.collect.CollectActorCore
+import org.cmsfs.role.collect.CollectActorCore
 
 class CollectJdbcService extends CollectActorCore {
   override val worker: ActorRef = context.actorOf(FromConfig.props(CollectJdbcWorker.props(serviceMembers)), "worker")
