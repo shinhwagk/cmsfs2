@@ -7,7 +7,7 @@ object ClusterInfo {
   val Service_Collect_Jdbc, Config_Collect_Jdbc, Role_Collect_Jdbc, Actor_Collect_Jdbc = "collect-jdbc"
   val Service_Bootstrap, Config_Bootstrap, Role_Bootstrap = "bootstrap"
   val Service_Process, Config_Process, Role_Process, Actor_Process = "process"
-  val Service_Terminal, Config_Terminal, Role_Terminal, Actor_Terminal = "terminal"
+  val Service_Service, Config_Service, Role_Service, Actor_Service = "service"
 
   case class Registration(name: String)
 

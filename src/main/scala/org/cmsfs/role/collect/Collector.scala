@@ -7,23 +7,17 @@ import play.api.libs.json.{Format, Json}
 object Collector extends
   SshCollectWorkerAction {
 
-  case class CollectConfig(files: Seq[Seq[String]], args: Option[String])
-
-  case class CollectorEnv(utcDate: String, collectName: String, connectName: Option[String] = None)
-
-  object CollectorEnv {
-    implicit val format: Format[CollectorEnv] = Json.format
-  }
+  case class CollectConfig(file: Seq[String], args: Option[String])
 
   sealed trait CollectorConfig
 
-  case class JdbcCollectorConfig(connect: CoreConnectJdbc, collect: CollectConfig, env: CollectorEnv)
+  case class JdbcCollectorConfig(connect: CoreConnectJdbc, collect: CollectConfig, env: Map[String, String])
     extends CollectorConfig
 
-  case class SshCollectorConfig(connect: CoreConnectSsh, collect: CollectConfig, env: CollectorEnv)
+  case class SshCollectorConfig(connect: CoreConnectSsh, collect: CollectConfig, env: Map[String, String])
     extends CollectorConfig
 
-  case class LocalCollectorConfig(collect: CollectConfig, env: CollectorEnv)
+  case class LocalCollectorConfig(collect: CollectConfig, env: Map[String, String])
     extends CollectorConfig
 
   type Collector = () => Option[String]
@@ -32,12 +26,12 @@ object Collector extends
     val ip = config.connect.ip
     val port = config.connect.port
     val user = config.connect.user
-    val file = config.collect.files(0)
+    val file = config.collect.file
     () => executeScriptBySsh(ip, port, user, file)
   }
 
   private def jdbcCollector(config: JdbcCollectorConfig): Collector = {
-    val sqlFile = config.collect.files(0)
+    val sqlFile = config.collect.file(0)
     () => executeScriptBySsh("", 11, "", Seq(""))
   }
 

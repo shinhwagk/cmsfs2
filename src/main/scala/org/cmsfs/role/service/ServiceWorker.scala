@@ -1,31 +1,33 @@
 package org.cmsfs.role.service
 
 import akka.actor.{Actor, ActorLogging, Props}
-import play.api.libs.ws.ahc.StandaloneAhcWSClient
+import org.cmsfs.config.db.QueryConfig
+import org.cmsfs.config.db.table.ConfTaskService
+import org.cmsfs.role.service.Servicer.{ServiceConfig, ServicerConfig}
+
+import scala.util.{Failure, Success}
 
 class ServiceWorker extends Actor with ActorLogging {
 
-  val wsClient: StandaloneAhcWSClient = StandaloneAhcWSClient()
+  log.info("ServiceWorker start.")
+
+  import context.dispatcher
 
   override def receive: Receive = {
-    case ServiceMessages.WorkerJob(method, url, body) => {
+    case ServiceMessages.WorkerJob(confService: ConfTaskService, env: Map[String, String], processResult: String) => {
 
-      val response = method.toUpperCase() match {
-        case "POST" =>
-          wsClient.url(url).post(body)
-        case "GET" =>
-          wsClient.url(url).get()
-        case "DELETE" =>
-          wsClient.url(url).delete()
-        case "PUT" =>
-          wsClient.url(url).put(body)
+      println(s"service worker processResult: ${processResult}")
+
+      val serviceId = confService.id
+      val serviceArgs = confService.args
+      QueryConfig.getCoreServiceById(serviceId) onComplete {
+        case Success(coreService) =>
+          val serviceConfig = ServiceConfig(coreService.files, serviceArgs)
+          val servicerConfig = ServicerConfig(processResult, serviceConfig, env)
+          Servicer.executeService(servicerConfig)
+
+        case Failure(ex) => log.error("coreService query error: " + ex.getMessage)
       }
-
-      response.foreach { response =>
-        val statusText: String = response.statusText
-        println(s"Got a response $statusText")
-      }
-
     }
   }
 }

@@ -16,6 +16,8 @@ object QueryConfig {
 
   private val coreProcesses = TableQuery[CoreProcesses]
 
+  private val coreServices = TableQuery[CoreServices]
+
   private val confBootstrap = TableQuery[ConfBootstraps]
 
   def getCoreConnectorSshById(id: Int): Future[CoreConnectSsh] = {
@@ -32,6 +34,10 @@ object QueryConfig {
 
   def getCoreProcessById(id: Int) = {
     db.run(coreProcesses.filter(_.id === id).result.head)
+  }
+
+  def getCoreServiceById(id: Int) = {
+    db.run(coreServices.filter(_.id === id).result.head)
   }
 
   def getConfBootstrap = {

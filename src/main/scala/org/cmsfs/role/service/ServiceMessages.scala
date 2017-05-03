@@ -1,7 +1,9 @@
 package org.cmsfs.role.service
 
+import org.cmsfs.config.db.table.ConfTaskService
+
 object ServiceMessages {
 
-  case class WorkerJob(method: String, url: String, body: Option[String])
+  case class WorkerJob(confService: ConfTaskService, env: Map[String, String], data: String)
 
 }

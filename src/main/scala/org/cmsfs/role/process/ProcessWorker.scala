@@ -1,28 +1,47 @@
 package org.cmsfs.role.process
 
-import akka.actor.{Actor, ActorLogging, Props}
+import akka.actor.{Actor, ActorLogging, Props, RootActorPath}
+import akka.cluster.Member
+import org.cmsfs.ClusterInfo
 import org.cmsfs.config.db.QueryConfig
 import org.cmsfs.role.process.ProcessMessages.WorkerJob
 import org.cmsfs.role.process.Processor.{ProcessConfig, ProcessorConfig}
+import org.cmsfs.role.service.ServiceMessages
 
-class ProcessorWorker extends Actor with ActorLogging {
+import scala.collection.mutable
+import scala.util.Random
+
+class ProcessorWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]]) extends Actor with ActorLogging {
   println("ProcessWorker start.")
 
   import context.dispatcher
 
   override def receive: Receive = {
-    case WorkerJob(confTaskProcess, result, env) =>
-      println(s"result ${result} ${confTaskProcess.args}")
-      println(s"result ${confTaskProcess.args}")
+    case WorkerJob(confTaskProcess, result, env, argsOpt) =>
       QueryConfig.getCoreProcessById(confTaskProcess.id).foreach { coreProcess =>
-        println(coreProcess)
         val processConfig = ProcessConfig(coreProcess.files, confTaskProcess.args)
         val processorConfig = ProcessorConfig(result, processConfig, env)
-//        Processor.executeProcess(processorConfig)
+        try {
+          val processResult: Option[String] = Processor.executeProcess(processorConfig)
+
+          if (processResult.isDefined) {
+            confTaskProcess.services.foreach { confService =>
+              val members = serviceMembers.get(ClusterInfo.Service_Service).get
+              if (members.length >= 1) {
+                val member = members(new Random().nextInt(members.length))
+                println(processResult)
+                context.actorSelection(RootActorPath(member.address) / "user" / ClusterInfo.Actor_Service) !
+                  ServiceMessages.WorkerJob(confService, env, processResult.get)
+              }
+            }
+          }
+        } catch {
+          case ex: Exception => println("process execute error: " + ex.getMessage)
+        }
       }
   }
 }
 
 object ProcessorWorker {
-  val props = Props[ProcessorWorker]
+  def props(serviceMembers: mutable.Map[String, IndexedSeq[Member]]) = Props(new ProcessorWorker(serviceMembers))
 }

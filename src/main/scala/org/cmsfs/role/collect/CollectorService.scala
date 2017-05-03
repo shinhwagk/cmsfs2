@@ -6,10 +6,9 @@ import akka.cluster.{Cluster, Member, MemberStatus}
 import org.cmsfs.ClusterInfo._
 import org.cmsfs.Common
 import org.cmsfs.config.db.QueryConfig
-import org.cmsfs.role.collect.Collector.{CollectConfig, CollectorEnv}
+import org.cmsfs.role.collect.Collector.CollectConfig
 
 import scala.collection.mutable
-import scala.util.{Failure, Success}
 
 class CollectorService extends Actor with ActorLogging {
 
@@ -44,20 +43,22 @@ class CollectorService extends Actor with ActorLogging {
       Common.unRegisterMember(member, serviceMembers)
     case CollectorServiceMessage.WorkerJob(task, utcDate) =>
       QueryConfig.getCoreCollectById(task.collect.id).foreach { collect =>
-        val conf = CollectConfig(collect.files, task.collect.args)
-        val env = CollectorEnv(utcDate, collect.name)
+        val conf = CollectConfig(collect.file, task.collect.args)
+        val env = Map("utc-data" -> utcDate, "collect-name" -> collect.name)
         collect.mode match {
           case "collect-ssh" =>
             val workers: IndexedSeq[Member] = serviceMembers.get(Service_Collect_Ssh).get
             if (workers.length >= 1) {
-              context.actorSelection(RootActorPath(workers(0).address) / "user" / Actor_Collect_Ssh) ! CollectorWorkerMessage.WorkerJob(task, conf, env)
+              context.actorSelection(RootActorPath(workers(0).address) / "user" / Actor_Collect_Ssh) !
+                CollectorWorkerMessage.WorkerJob(task, conf, env)
             } else {
               log.error(s"collect service ${Service_Collect_Ssh} less.")
             }
           case "collect-jdbc" =>
             val workers: IndexedSeq[Member] = serviceMembers.get(Service_Collect_Jdbc).get
             if (workers.length >= 1) {
-              context.actorSelection(RootActorPath(workers(0).address) / "user" / Actor_Collect_Jdbc) ! CollectorWorkerMessage.WorkerJob(task, conf, env)
+              context.actorSelection(RootActorPath(workers(0).address) / "user" / Actor_Collect_Jdbc) !
+                CollectorWorkerMessage.WorkerJob(task, conf, env)
             } else {
               log.error(s"collect service ${Service_Collect_Jdbc} less.")
             }

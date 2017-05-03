@@ -24,4 +24,5 @@ libraryDependencies ++= Seq(
   oracleJdbc from "file:///" + baseDirectory.value / "lib" / "ojdbc8.jar"
 )
 
+
 enablePlugins(JavaAppPackaging)

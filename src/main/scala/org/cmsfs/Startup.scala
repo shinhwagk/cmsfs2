@@ -5,6 +5,7 @@ import org.cmsfs.role.collect.jdbc.CollectJdbcService
 import org.cmsfs.role.collect.local.CollectLocalScriptService
 import org.cmsfs.role.collect.ssh.SshCollectService
 import org.cmsfs.role.process.ProcessService
+import org.cmsfs.role.service.ServiceMaster
 
 object Startup {
   def main(args: Array[String]): Unit = {
@@ -33,6 +34,8 @@ object Startup {
         CollectJdbcService.main(args)
       case Service_Process =>
         ProcessService.main(args)
+      case Service_Service =>
+        ServiceMaster.main(args)
       case _ =>
         println(s"startup service: ${service} no exist.")
         System.exit(1)

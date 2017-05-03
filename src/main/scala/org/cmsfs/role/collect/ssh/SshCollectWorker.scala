@@ -2,14 +2,13 @@ package org.cmsfs.role.collect.ssh
 
 import akka.actor.{Actor, ActorLogging, Props, RootActorPath}
 import akka.cluster.Member
+import org.cmsfs.ClusterInfo._
 import org.cmsfs.config.db.QueryConfig
 import org.cmsfs.role.collect.{Collector, CollectorWorkerMessage}
-import org.cmsfs.role.collect.CollectorWorkerMessage.WorkerJob
 import org.cmsfs.role.process.ProcessMessages
-import org.cmsfs.ClusterInfo._
 
 import scala.collection.mutable
-import scala.util.{Failure, Random, Success}
+import scala.util.Random
 
 class SshCollectWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]])
   extends Actor with ActorLogging {
@@ -18,35 +17,24 @@ class SshCollectWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]])
 
   import context.dispatcher
 
-  //  var processCapacityCalculate = 0L
-
   override def receive: Receive = {
-    case CollectorWorkerMessage.WorkerJob(task, conf, collectorEnv) =>
-      println("CollectorWorkerMessage")
-
+    case CollectorWorkerMessage.WorkerJob(task, conf, env) =>
       val connectId = task.collect.connect.get
 
       QueryConfig.getCoreConnectorSshById(connectId).foreach { conn =>
-        val collectConfig = conf
-        val env = collectorEnv.copy(connectName = Some(conn.name))
-        val config: Collector.CollectorConfig = Collector.SshCollectorConfig(conn, collectConfig, env)
-        val resultOpt: Option[String] = Collector.executeCollect(config)()
-        resultOpt.foreach { result =>
+        val newEnv: Map[String, String] = env.+("conn-name" -> conn.name).+("conn-ip" -> conn.ip)
+        val collectorConfig: Collector.CollectorConfig = Collector.SshCollectorConfig(conn, conf, env)
+        val resultOpt: Option[String] = Collector.executeCollect(collectorConfig)()
+        resultOpt foreach { result =>
           task.processes.foreach { process =>
-            val formatMembers = serviceMembers.get(Actor_Process).get
-            if (formatMembers.length >= 1) {
-              val member = formatMembers(new Random().nextInt(formatMembers.length))
-              context.actorSelection(RootActorPath(member.address) / "user" / Actor_Process) ! ProcessMessages.WorkerJob(process, result, env)
+            val members: IndexedSeq[Member] = serviceMembers.get(Actor_Process).get
+            if (members.length >= 1) {
+              val member: Member = members(new Random().nextInt(members.length))
+              context.actorSelection(RootActorPath(member.address) / "user" / Actor_Process) !
+                ProcessMessages.WorkerJob(process, result, newEnv, process.args)
             }
           }
         }
-        //        task.processes.foreach{process=>
-        //          val formatMembers = serviceMembers.get(Actor_Process).get
-        //          if (formatMembers.length >= 1) {
-        //            val member = formatMembers(new Random().nextInt(formatMembers.length))
-        //            context.actorSelection(RootActorPath(member.address) / "user" / Actor_Process) ! ProcessMessages.WorkerJob(process, result.get, env)
-        //          }
-        //        }
       }
   }
 }
