@@ -4,9 +4,9 @@ import akka.actor.{ActorRef, Props}
 import akka.routing.FromConfig
 import org.cmsfs.ClusterInfo._
 import org.cmsfs.Common
-import org.cmsfs.role.collect.CollectServiceActorCore
+import org.cmsfs.role.collect.CollectServiceCore
 
-class SshCollectService extends CollectServiceActorCore {
+class SshCollectService extends CollectServiceCore {
   override val worker: ActorRef = context.actorOf(FromConfig.props(SshCollectWorker.props(serviceMembers)), selfPathName)
 }
 

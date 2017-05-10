@@ -10,7 +10,7 @@ import org.cmsfs.Common
 import scala.concurrent.duration._
 
 
-trait CollectServiceActorCore extends Actor with ActorLogging {
+trait CollectServiceCore extends Actor with ActorLogging {
   val cluster = Cluster(context.system)
 
   val selfPathName = "worker"

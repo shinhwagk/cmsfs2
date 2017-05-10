@@ -25,7 +25,7 @@ class ProcessorWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]]) e
           try {
             val processResult: Option[String] = Processor.executeProcess(processorConfig)
             if (processResult.isDefined) {
-              confTaskProcess.services.foreach { confService =>
+              confTaskProcess.services.foreach(_.foreach { confService =>
                 val members = serviceMembers.get(ClusterInfo.Service_Service).get
                 if (members.length >= 1) {
                   val member = members(new Random().nextInt(members.length))
@@ -33,7 +33,7 @@ class ProcessorWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]]) e
                     ServiceMessages.WorkerJob(confService, env, processResult.get)
                   //                println("process ", env.get("collect-name"), env.get("conn-name"), env.get("utc-date"), new Date().toInstant.toString)
                 }
-              }
+              })
             }
           } catch {
             case ex: Exception => println("process execute error: " + ex.getMessage)

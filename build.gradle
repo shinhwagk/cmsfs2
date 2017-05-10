@@ -11,10 +11,10 @@ dependencies {
     compile name: 'ojdbc8'
 //    compile "org.scala-lang:scala-library:${gradle.scala.version}"
     compile "org.scala-lang:scala-library:2.12.2"
-    compile 'com.typesafe.akka:akka-cluster_2.12:2.5.0'
-    compile 'com.typesafe.akka:akka-slf4j_2.12:2.5.0'
+    compile 'com.typesafe.akka:akka-cluster_2.12:2.5.1'
+    compile 'com.typesafe.akka:akka-slf4j_2.12:2.5.1'
 
-    compile 'com.typesafe.play:play-json_2.12:2.6.0-M7'
+    compile group: 'com.typesafe.play', name: 'play-json_2.12', version: '2.6.0-M7'
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
     compile group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.0'
     compile group: 'com.typesafe.slick', name: 'slick_2.12', version: '3.2.0'

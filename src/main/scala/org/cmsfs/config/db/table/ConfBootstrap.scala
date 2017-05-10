@@ -15,13 +15,13 @@ object ConfTaskService {
   implicit val format: Format[ConfTaskService] = Json.format
 }
 
-case class ConfTaskProcess(id: Int, args: Option[JsValue], services: Seq[ConfTaskService])
+case class ConfTaskAction(id: Int, args: Option[JsValue], services: Option[Seq[ConfTaskService]])
 
-object ConfTaskProcess {
-  implicit val format: Format[ConfTaskProcess] = Json.format
+object ConfTaskAction {
+  implicit val format: Format[ConfTaskAction] = Json.format
 }
 
-case class ConfTaskSchema(collect: ConfTaskCollect, processes: Seq[ConfTaskProcess])
+case class ConfTaskSchema(collect: ConfTaskCollect, actions: Option[Seq[ConfTaskAction]])
 
 object ConfTaskSchema {
   implicit val format: Format[ConfTaskSchema] = Json.format
