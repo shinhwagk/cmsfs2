@@ -8,3 +8,8 @@ alarm.mail
 alarm.mobile
 
 /workspace
+
+# gradle
+
+/.gradle
+/build

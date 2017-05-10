@@ -1,35 +1,41 @@
 {
-	"cron": "0 * * * * * ?",
-	"mode": "ssh",
-	"connector": [1,2,3],
-	"path": ["oracle", "common", "tablespace_space", "collect.sql"],
-	"args": "",
-	"formats": {
-	  "analyze": [
-      {
-        "path": [],
-        "apply": [
-	        {"ids": [0],     "args": "", "_index": "", "_type": ""},
-	        {"ids": [1,2,3], "args": "", "_index": "", "_type": ""}
-	      ]
-      }
-    ],
-	  "alarm": [
-      {
-        "path": [],
-        "apply": [
-          {"ids": [0],     "args":[
-                                    {"threshold": "", "notification": {"mails": [], "mobiles": []}},
-                                    {"threshold": "", "notification": {"mails": [], "mobiles": []}}
-                                  ]
-          },
-          {"ids": [1,2,3], "args":[
-                                    {"threshold": "", "notification": {"mails": [], "mobiles": []}},
-                                    {"threshold": "", "notification": {"mails": [], "mobiles": []}}
-                                  ]
+  "collect": {
+    "id": 1,
+    "connect": 1,
+    "args": ""
+  },
+  "porcesses": [
+    {
+      "id": 1,
+      "name": "proc_alarm_mail",
+      "args": {
+        "threshold": "80"
+      },
+      "services": [
+        {
+          "id": 1,
+          "name":"alarm",
+          "args": {
+            "mails":[]
           }
-        ]
-      }
-    ]
-	}
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "proc_es",
+      "args": {
+      },
+      "services": [
+        {
+          "id": 1,
+          "name":"es",
+          "args": {
+            "_index":"x",
+            "_type":"ddd"
+          }
+        }
+      ]
+    }
+  ]
 }
