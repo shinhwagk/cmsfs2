@@ -1,13 +1,14 @@
-package org.cmsfs.role.collect.jdbc
+package org.cmsfs.role.collect.jdbc.oracle
 
 import akka.actor.{ActorRef, Props}
 import akka.routing.FromConfig
-import org.cmsfs.Common
 import org.cmsfs.ClusterInfo.{Actor_Collect_Jdbc, Service_Collect_Jdbc}
-import org.cmsfs.role.collect.CollectActorCore
+import org.cmsfs.Common
+import org.cmsfs.role.collect.CollectServiceActorCore
+import org.cmsfs.role.collect.jdbc.CollectJdbcWorker
 
-class CollectJdbcService extends CollectActorCore {
-  override val worker: ActorRef = context.actorOf(FromConfig.props(CollectJdbcWorker.props(serviceMembers)), "worker")
+class CollectJdbcService extends CollectServiceActorCore {
+  override val worker: ActorRef = context.actorOf(FromConfig.props(CollectJdbcWorker.props(serviceMembers)), selfPathName)
 }
 
 object CollectJdbcService {

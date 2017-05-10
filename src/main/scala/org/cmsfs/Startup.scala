@@ -1,7 +1,7 @@
 package org.cmsfs
 
 import org.cmsfs.role.bootstrap.BootstrapService
-import org.cmsfs.role.collect.jdbc.CollectJdbcService
+import org.cmsfs.role.collect.jdbc.oracle.CollectJdbcService
 import org.cmsfs.role.collect.local.CollectLocalScriptService
 import org.cmsfs.role.collect.ssh.SshCollectService
 import org.cmsfs.role.process.ProcessService

@@ -1,0 +1,29 @@
+apply plugin: 'scala'
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    compile name: 'ojdbc8'
+//    compile "org.scala-lang:scala-library:${gradle.scala.version}"
+    compile "org.scala-lang:scala-library:2.12.2"
+    compile 'com.typesafe.akka:akka-cluster_2.12:2.5.0'
+    compile 'com.typesafe.akka:akka-slf4j_2.12:2.5.0'
+
+    compile 'com.typesafe.play:play-json_2.12:2.6.0-M7'
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+    compile group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.0'
+    compile group: 'com.typesafe.slick', name: 'slick_2.12', version: '3.2.0'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
+    compile group: 'com.jcraft', name: 'jsch', version: '0.1.54'
+    compile group: 'com.typesafe.play', name: 'play-ahc-ws-standalone_2.12', version: '1.0.0-M8'
+}
+
+//tasks.withType(ScalaCompile) {
+//    scalaCompileOptions.additionalParameters = gradle.scala.compileFlags
+//}

@@ -4,9 +4,9 @@ import akka.actor.{ActorRef, Props}
 import akka.routing.FromConfig
 import org.cmsfs.ClusterInfo._
 import org.cmsfs.Common
-import org.cmsfs.role.collect.CollectActorCore
+import org.cmsfs.role.collect.CollectServiceActorCore
 
-class CollectLocalScriptService extends CollectActorCore {
+class CollectLocalScriptService extends CollectServiceActorCore {
   override val worker: ActorRef = context.actorOf(FromConfig.props(CollectScriptLocalWorker.props), "worker")
 }
 

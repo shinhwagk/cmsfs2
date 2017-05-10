@@ -14,10 +14,6 @@ object Servicer {
     val result: String = config.result
     val args: Option[JsValue] = config.process.confArgsOpt
     val env = config.env
-
-    println(files)
-    println(env)
-    println(args)
     ScriptExecute.executeScript(files, env, Some(result), args, ScriptExecutorMode.DOWN, false)
   }
 }

@@ -28,7 +28,8 @@ class ServiceMaster extends Actor with ActorLogging {
     case MemberRemoved(member, previousStatus) =>
       log.info("Member is Removed: {} after {}",
         member.address, previousStatus)
-    case job: ServiceMessages.WorkerJob => worker ! job
+    case job: ServiceMessages.WorkerJob =>
+      worker ! job
     case _: MemberEvent => // ignore
   }
 
