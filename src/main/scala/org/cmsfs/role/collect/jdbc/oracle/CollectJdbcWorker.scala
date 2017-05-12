@@ -3,13 +3,13 @@ package org.cmsfs.role.collect.jdbc
 import akka.actor.Props
 import akka.cluster.Member
 import org.cmsfs.config.db.QueryConfig
+import org.cmsfs.config.db.table.ConfTaskAction
 import org.cmsfs.role.collect.{Collector, CollectorWorkerCore, CollectorWorkerMessage}
 
 import scala.collection.mutable
 import scala.util.{Failure, Success}
 
-class CollectJdbcWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]])
-  extends CollectorWorkerCore(serviceMembers) {
+class CollectJdbcWorker extends CollectorWorkerCore {
 
   import context.dispatcher
 
@@ -17,6 +17,7 @@ class CollectJdbcWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]])
     case CollectorWorkerMessage.WorkerJob(confTaskSchema, collectConfig, env) =>
       val connectId = confTaskSchema.collect.connect.get
 
+      val serviceActor = sender()
       QueryConfig.getCoreConnectorJdbcById(connectId) onComplete {
         case Success(conn) => {
           implicit val newEnv: Map[String, String] =
@@ -34,9 +35,13 @@ class CollectJdbcWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]])
               Collector.executeCollect(collectorConfig)()
           }
 
-          val processesOpt = confTaskSchema.actions
+          val processesOpt: Option[Seq[ConfTaskAction]] = confTaskSchema.actions
+          for {
+            r <- resultOpt
+            p <- processesOpt
+          } yield serviceActor ! (r, p,env)
 
-          toProcess(resultOpt, processesOpt)
+          //
         }
         case Failure(ex) => log.error(ex.getMessage)
       }
@@ -44,5 +49,5 @@ class CollectJdbcWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]])
 }
 
 object CollectJdbcWorker {
-  def props(serviceMembers: mutable.Map[String, IndexedSeq[Member]]) = Props(new CollectJdbcWorker(serviceMembers))
+  val props = Props[CollectJdbcWorker]
 }

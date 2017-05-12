@@ -1,19 +1,18 @@
 package org.cmsfs.role.collect
 
-import akka.actor.SupervisorStrategy.{Restart, Resume}
+import akka.actor.SupervisorStrategy.Restart
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy}
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
-import org.cmsfs.ClusterInfo._
-import org.cmsfs.Common
+import akka.routing.FromConfig
+import org.cmsfs.config.db.table.ConfTaskAction
+import org.cmsfs.role.process.ProcessMessages
 
 import scala.concurrent.duration._
 
 
 trait CollectServiceCore extends Actor with ActorLogging {
   val cluster = Cluster(context.system)
-
-  val selfPathName = "worker"
 
   val collectServiceName = this.getClass.getName
 
@@ -34,20 +33,32 @@ trait CollectServiceCore extends Actor with ActorLogging {
     cluster.unsubscribe(self)
   }
 
-  val memberNames = Service_Process :: Nil
-
-  val serviceMembers = Common.initNeedServices(memberNames)
-
   override def receive: Receive = {
     case MemberUp(member) =>
       log.info("Member is Up: {}, role: {}.", member.address, member.roles)
-      Common.registerMember(member, serviceMembers)
     case UnreachableMember(member) =>
       log.error("Member detected as unreachable: {}, role: {}.", member, member.roles)
-      Common.unRegisterMember(member, serviceMembers)
-    //    case MemberRemoved(member, previousStatus) =>
-    //      log.info("Member is Removed: {} after {}", member.address, previousStatus)
     case msg: CollectorWorkerMessage.WorkerJob => worker ! msg
+    case a@(s: String, q: Seq[ConfTaskAction], f: Map[String, String]) =>
+      toProcess(s,q,f)
     case _: MemberEvent => // ignore
+  }
+
+  val actionActor = context.actorOf(FromConfig.props(), "action")
+
+  def toProcess(result: String, processes: Seq[ConfTaskAction], env: Map[String, String]): Unit = {
+    processes.foreach { process =>
+      actionActor ! ProcessMessages.WorkerJob(process, result, env, process.args)
+    }
+  }
+
+  def toProcess(resultOpt: Option[String], processesOpt: Option[Seq[ConfTaskAction]])(implicit env: Map[String, String]): Unit = {
+    if (resultOpt.isEmpty) {
+      log.warning(s"collect ${env.get("collect-name")} not result.")
+    } else if (processesOpt.isEmpty) {
+      log.warning(s"collect ${env.get("collect-name")} not processes.")
+    } else {
+      toProcess(resultOpt.get, processesOpt.get, env)
+    }
   }
 }

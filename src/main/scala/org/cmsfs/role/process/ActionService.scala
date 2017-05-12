@@ -6,11 +6,12 @@ import akka.cluster.ClusterEvent.{MemberEvent, MemberRemoved, MemberUp, Unreacha
 import org.cmsfs.ClusterInfo._
 import org.cmsfs.Common
 import org.cmsfs.config.db.QueryConfig
+import org.cmsfs.role.ServiceStart
 import org.cmsfs.role.process.Processor.{ProcessConfig, ProcessorConfig}
 
 import scala.concurrent.Future
 
-class ProcessService extends Actor with ActorLogging {
+class ActionService extends Actor with ActorLogging {
 
   import context.dispatcher
 
@@ -58,11 +59,4 @@ class ProcessService extends Actor with ActorLogging {
   }
 }
 
-object ProcessService {
-  def main(args: Array[String]): Unit = {
-    val seed = args(0)
-    val port = args(1)
-    val system = Common.genActorSystem(Role_Process, seed, port)
-    system.actorOf(Props[ProcessService], name = Actor_Process)
-  }
-}
+object ActionService extends ServiceStart[ActionService]

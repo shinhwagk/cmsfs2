@@ -8,8 +8,7 @@ import org.cmsfs.role.collect.{Collector, CollectorWorkerCore, CollectorWorkerMe
 import scala.collection.mutable
 import scala.util.{Failure, Success}
 
-class SshCollectWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]])
-  extends CollectorWorkerCore(serviceMembers) {
+class SshCollectWorker extends CollectorWorkerCore {
 
   log.info("SshCollectWorker start.")
 
@@ -17,6 +16,7 @@ class SshCollectWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]])
 
   override def receive: Receive = {
     case CollectorWorkerMessage.WorkerJob(task, conf, env) =>
+      val serviceActor = sender()
       val connectId = task.collect.connect.get
       QueryConfig.getCoreConnectorSshById(connectId) onComplete {
         case Success(conn) => {
@@ -27,7 +27,10 @@ class SshCollectWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]])
 
             val processesOpt = task.actions
 
-            toProcess(resultOpt, processesOpt)
+            for {
+              r <- resultOpt
+              p <- processesOpt
+            } yield serviceActor ! (r, p,env)
           } catch {
             case ex: Exception => log.error(ex.getMessage)
           }
@@ -38,5 +41,5 @@ class SshCollectWorker(serviceMembers: mutable.Map[String, IndexedSeq[Member]])
 }
 
 object SshCollectWorker {
-  def props(serviceMembers: mutable.Map[String, IndexedSeq[Member]]) = Props(new SshCollectWorker(serviceMembers))
+  val props = Props[SshCollectWorker]
 }
