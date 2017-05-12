@@ -10,6 +10,7 @@ import org.cmsfs.role.ServiceStart
 import org.cmsfs.role.process.Processor.{ProcessConfig, ProcessorConfig}
 
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class ActionService extends Actor with ActorLogging {
 
@@ -39,7 +40,6 @@ class ActionService extends Actor with ActorLogging {
 
   def processAction(wa: WorkerAction): Unit = {
     val action = wa.action
-    println(action.id)
     val result = wa.collectResult
     val env = wa.evn
     val processResult: Future[Option[String]] = for {
@@ -50,11 +50,14 @@ class ActionService extends Actor with ActorLogging {
       Processor.executeProcess(processorConfig)
     }
 
-    processResult.foreach { rOpt =>
-      for {
-        r <- rOpt
-        actions <- action.actions
-      } yield actions foreach { self ! WorkerAction(r, env, _) }
+    processResult onComplete {
+      case Success(rOpt) =>
+        for {
+          r <- rOpt
+          actions <- action.actions
+        } yield actions foreach (self ! WorkerAction(r, env, _))
+      case Failure(ex) =>
+        log.error(ex.getMessage)
     }
   }
 }
