@@ -44,7 +44,7 @@ dependencies {
 tasks.withType(ScalaCompile) {
     configure(scalaCompileOptions.forkOptions) {
         memoryMaximumSize = '1g'
-        jvmArgs = ['-XX:MaxPermSize=512m', '-DsocksProxyHost=127.0.0.1', '-DsocksProxyPort=1080']
+        jvmArgs = ['-XX:MaxPermSize=512m']
     }
     scalaCompileOptions.with {
         force = true
