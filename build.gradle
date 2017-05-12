@@ -1,4 +1,5 @@
 apply plugin: 'scala'
+apply plugin: 'application'
 
 repositories {
     mavenCentral()
@@ -14,6 +15,8 @@ sourceSets {
         }
     }
 }
+
+mainClassName = 'TestStart'
 
 def akkaVersion = '2.5.1'
 
