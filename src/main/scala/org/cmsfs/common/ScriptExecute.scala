@@ -129,7 +129,9 @@ object ScriptExecute {
     val result: Option[String] = try {
       Some(Process(executor, new java.io.File(workDirName), env.toSeq: _*).!!)
     } catch {
-      case ex: Exception => None
+      case ex: Exception =>
+        println(ex.getMessage)
+        None
     }
     deleteWorkDirFun()
     result

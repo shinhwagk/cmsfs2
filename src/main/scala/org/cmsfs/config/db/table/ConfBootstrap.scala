@@ -15,7 +15,7 @@ object ConfTaskService {
   implicit val format: Format[ConfTaskService] = Json.format
 }
 
-case class ConfTaskAction(id: Int, args: Option[JsValue], services: Option[Seq[ConfTaskService]])
+case class ConfTaskAction(id: Int, args: Option[JsValue], actions: Option[Seq[ConfTaskAction]])
 
 object ConfTaskAction {
   implicit val format: Format[ConfTaskAction] = Json.format
