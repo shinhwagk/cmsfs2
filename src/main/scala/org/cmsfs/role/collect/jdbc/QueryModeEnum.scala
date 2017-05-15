@@ -1,4 +1,4 @@
-package org.cmsfs.role.collect.jdbc.oracle
+package org.cmsfs.role.collect.jdbc
 
 object QueryModeEnum extends Enumeration {
   type QueryMode = Value

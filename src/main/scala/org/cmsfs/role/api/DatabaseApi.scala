@@ -14,9 +14,7 @@ trait DatabaseApi {
 
   private val coreCollects = TableQuery[CoreCollects]
 
-  private val coreProcesses = TableQuery[CoreProcesses]
-
-  private val coreServices = TableQuery[CoreServices]
+  private val coreProcesses = TableQuery[CoreActions]
 
   private val confBootstrap = TableQuery[ConfBootstraps]
 
@@ -34,10 +32,6 @@ trait DatabaseApi {
 
   def getCoreProcessById(id: Int) = {
     db.run(coreProcesses.filter(_.id === id).result.head)
-  }
-
-  def getCoreServiceById(id: Int) = {
-    db.run(coreServices.filter(_.id === id).result.head)
   }
 
   def getConfBootstrap = {

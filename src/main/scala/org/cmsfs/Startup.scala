@@ -2,10 +2,10 @@ package org.cmsfs
 
 import org.cmsfs.role.api.ApiService
 import org.cmsfs.role.bootstrap.BootstrapService
-import org.cmsfs.role.collect.jdbc.oracle.CollectJdbcService
+import org.cmsfs.role.collect.jdbc.JdbcCollectService
 import org.cmsfs.role.collect.local.CollectLocalScriptService
 import org.cmsfs.role.collect.ssh.SshCollectService
-import org.cmsfs.role.process.ActionService
+import org.cmsfs.role.action.ActionService
 
 object Startup {
   def main(args: Array[String]): Unit = {
@@ -28,7 +28,7 @@ object Startup {
       case Service_Collect_Ssh =>
         SshCollectService.main(args)
       case Service_Collect_Jdbc =>
-        CollectJdbcService.main(args)
+        JdbcCollectService.main(args)
       case Service_Action =>
         ActionService.main(args)
       case Service_Api =>

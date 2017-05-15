@@ -14,9 +14,7 @@ object QueryConfig {
 
   private val coreCollects = TableQuery[CoreCollects]
 
-  private val coreProcesses = TableQuery[CoreProcesses]
-
-  private val coreServices = TableQuery[CoreServices]
+  private val coreActions = TableQuery[CoreActions]
 
   private val confBootstrap = TableQuery[ConfBootstraps]
 
@@ -33,11 +31,7 @@ object QueryConfig {
   }
 
   def getCoreProcessById(id: Int) = {
-    db.run(coreProcesses.filter(_.id === id).result.head)
-  }
-
-  def getCoreServiceById(id: Int) = {
-    db.run(coreServices.filter(_.id === id).result.head)
+    db.run(coreActions.filter(_.id === id).result.head)
   }
 
   def getConfBootstrap = {

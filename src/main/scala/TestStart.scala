@@ -20,7 +20,5 @@ object TestStart {
     Startup.main(Seq(clusterName, Service_Action, "2769", "127.0.0.1:2579").toArray)
     Thread.sleep(1000)
     Startup.main(Seq(clusterName, Service_Api, "2777", "127.0.0.1:2579").toArray)
-    //    Thread.sleep(1000)
-    //    Startup.main(Seq(Service_Service, "2771", "127.0.0.1:2579").toArray)
   }
 }

@@ -7,13 +7,14 @@ import org.cmsfs.config.db.QueryConfig
 import org.cmsfs.config.db.table.ConfTaskSchema
 import org.cmsfs.role.collect.Collector.CollectConfig
 
-class CollectorService extends Actor with ActorLogging {
+class CollectorMasterService extends Actor with ActorLogging {
 
-  log.info("CollectorService start.")
+  log.info(s"${this.getClass.getName} start.")
 
   import context.dispatcher
 
   val collectSshActor: ActorRef = context.actorOf(FromConfig.props(), name = "collect-ssh")
+
   val collectJdbcActor: ActorRef = context.actorOf(FromConfig.props(), name = "collect-jdbc")
 
   override def receive: Receive = {
@@ -21,21 +22,21 @@ class CollectorService extends Actor with ActorLogging {
       QueryConfig.getCoreCollectById(task.collect.id).foreach { collect =>
         val conf: CollectConfig = CollectConfig(collect.file, task.collect.args)
         val env: Map[String, String] = Map("utc-date" -> utcDate, "collect-name" -> collect.name)
-        val dFun = collectServiceDistributor(task, conf, env, utcDate) _
+        val dFun = collectServiceDistributor(task, conf, env, utcDate, collect.mode) _
         collect.mode match {
-          case s@Service_Collect_Ssh => dFun(s, collectSshActor)
-          case s@Service_Collect_Jdbc => dFun(s, collectJdbcActor)
+          case s@Service_Collect_Ssh => dFun(collectSshActor)
+          case s@Service_Collect_Jdbc => dFun(collectJdbcActor)
           case _ => println("unkonws")
         }
       }
   }
 
-  def collectServiceDistributor(task: ConfTaskSchema, conf: CollectConfig, env: Map[String, String], utcDate: String)
-                               (serviceName: String, collectActor: ActorRef) = {
+  def collectServiceDistributor(task: ConfTaskSchema, conf: CollectConfig, env: Map[String, String], utcDate: String, serviceName: String)
+                               (collectActor: ActorRef) = {
     collectActor ! CollectorWorkerMessage.WorkerJob(task, conf, env)
   }
 }
 
-object CollectorService {
-  val props = Props[CollectorService]
+object CollectorMasterService {
+  val props = Props[CollectorMasterService]
 }

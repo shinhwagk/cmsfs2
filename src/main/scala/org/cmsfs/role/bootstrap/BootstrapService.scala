@@ -2,7 +2,7 @@ package org.cmsfs.role.bootstrap
 
 import java.util.Date
 
-import akka.actor.{Actor, ActorLogging, ActorRef}
+import akka.actor.{Actor, ActorLogging}
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent.{MemberEvent, MemberUp, ReachableMember, UnreachableMember}
 import akka.routing.FromConfig
@@ -10,7 +10,7 @@ import org.cmsfs.config.db.table.ConfBootstrap
 import org.cmsfs.role.ServiceStart
 import org.cmsfs.role.api.Api
 import org.cmsfs.role.bootstrap.BootstrapService.CollectScheduler
-import org.cmsfs.role.collect.{CollectorService, CollectorServiceMessage}
+import org.cmsfs.role.collect.{CollectorMasterService, CollectorServiceMessage}
 import org.quartz.CronExpression
 
 import scala.concurrent.duration._
@@ -21,16 +21,18 @@ class BootstrapService extends Actor with ActorLogging {
 
   import context.dispatcher
 
-  context.system.scheduler.schedule(0.seconds, 1.seconds, self, CollectScheduler)
-
   override def preStart(): Unit =
     cluster.subscribe(self, classOf[MemberUp], classOf[UnreachableMember], classOf[ReachableMember])
 
   override def postStop(): Unit = cluster.unsubscribe(self)
 
+  Cluster.get(context.system).registerOnMemberUp {
+    context.system.scheduler.schedule(0.seconds, 1.seconds, self, CollectScheduler)
+  }
+
   val apiActor = context.actorOf(FromConfig.props(), name = "api")
 
-  val collectServiceActor = context.actorOf(CollectorService.props, "collect-service")
+  val collectServiceActor = context.actorOf(CollectorMasterService.props, "collect-service")
 
   override def receive: Receive = {
     case MemberUp(member) =>

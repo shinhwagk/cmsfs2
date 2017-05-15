@@ -2,7 +2,7 @@ package org.cmsfs.role.collect
 
 import org.cmsfs.common.ScriptExecute
 import org.cmsfs.config.db.table.{CoreConnectJdbc, CoreConnectSsh}
-import org.cmsfs.role.collect.jdbc.oracle.{CollectingMysql, CollectingOracle}
+import org.cmsfs.role.collect.jdbc.{CollectingMysql, CollectingOracle}
 import org.cmsfs.role.collect.ssh.SshCollectWorkerAction
 
 import scala.concurrent.Await

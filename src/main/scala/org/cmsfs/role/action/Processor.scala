@@ -1,13 +1,13 @@
-package org.cmsfs.role.process
+package org.cmsfs.role.action
 
 import org.cmsfs.common.{ScriptExecute, ScriptExecutorMode}
 import play.api.libs.json.{JsValue, Json}
 
 object Processor {
 
-  case class ProcessConfig(files: Seq[Seq[String]], confArgsOpt: Option[JsValue])
+  case class ActionConfig(files: Seq[Seq[String]], confArgsOpt: Option[JsValue])
 
-  case class ProcessorConfig(result: String, process: ProcessConfig, env: Map[String, String])
+  case class ProcessorConfig(result: String, process: ActionConfig, env: Map[String, String])
 
   def executeProcess(config: ProcessorConfig): Option[String] = {
     val files: Seq[Seq[String]] = config.process.files

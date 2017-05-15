@@ -1,22 +1,19 @@
 package org.cmsfs.role.collect.ssh
 
-import akka.actor.Props
-import akka.cluster.Member
+import akka.actor.{ActorRef, Props}
 import org.cmsfs.config.db.QueryConfig
 import org.cmsfs.role.collect.{Collector, CollectorWorkerCore, CollectorWorkerMessage}
 
-import scala.collection.mutable
 import scala.util.{Failure, Success}
 
-class SshCollectWorker extends CollectorWorkerCore {
+class SshCollectWorker(collectorMasterActorRef: ActorRef) extends CollectorWorkerCore(collectorMasterActorRef) {
 
-  log.info("SshCollectWorker start.")
+  log.info(s"${this.getClass.getName} start.")
 
   import context.dispatcher
 
   override def receive: Receive = {
     case CollectorWorkerMessage.WorkerJob(task, conf, env) =>
-      val serviceActor = sender()
       val connectId = task.collect.connect.get
       QueryConfig.getCoreConnectorSshById(connectId) onComplete {
         case Success(conn) => {
@@ -25,12 +22,7 @@ class SshCollectWorker extends CollectorWorkerCore {
             val collectorConfig: Collector.CollectorConfig = Collector.SshCollectorConfig(conn, conf, env)
             val resultOpt: Option[String] = Collector.executeCollect(collectorConfig)()
 
-            val processesOpt = task.actions
-
-            for {
-              r <- resultOpt
-              p <- processesOpt
-            } yield serviceActor ! (r, p,env)
+            toProcess(resultOpt, task.actions, newEnv)
           } catch {
             case ex: Exception => log.error(ex.getMessage)
           }
@@ -41,5 +33,5 @@ class SshCollectWorker extends CollectorWorkerCore {
 }
 
 object SshCollectWorker {
-  val props = Props[SshCollectWorker]
+  def props(master: ActorRef) = Props(new SshCollectWorker(master))
 }

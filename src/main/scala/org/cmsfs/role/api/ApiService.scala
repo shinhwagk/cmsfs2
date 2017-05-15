@@ -2,15 +2,13 @@ package org.cmsfs.role.api
 
 import java.util.Date
 
-import akka.actor.{Actor, ActorLogging, Props}
+import akka.actor.{Actor, ActorLogging}
 import akka.cluster.Cluster
 import akka.cluster.ClusterEvent.{MemberEvent, MemberUp, UnreachableMember}
-import org.cmsfs.Common
 import org.cmsfs.config.db.QueryConfig
 import org.cmsfs.role.ServiceStart
 import org.quartz.CronExpression
 
-import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 class ApiService extends Actor with ActorLogging {

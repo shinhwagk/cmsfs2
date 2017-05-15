@@ -1,4 +1,4 @@
-package org.cmsfs.role.process
+package org.cmsfs.role.action
 
 import play.api.libs.json.JsValue
 
