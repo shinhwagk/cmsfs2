@@ -70,24 +70,16 @@ object ScriptExecute {
     }
   }
 
-  def executeScript(files: Seq[Seq[String]], env: Map[String, String], data: Option[String], args: Option[JsValue], executeMode: ScriptExecuteMode, resultToArrayByLine: Boolean): Option[String] = {
-    val rs: Option[String] = executeMode match {
+  def executeScript(files: Seq[Seq[String]], env: Map[String, String], data: Option[String], args: Option[JsValue], executeMode: ScriptExecuteMode, resultToArrayByLine: Boolean): String = {
+    executeMode match {
       case ScriptExecutorMode.ONLINE =>
         executeScriptForOnline(files, env, data, args)
       case ScriptExecutorMode.DOWN =>
         executeScriptForDown(files, env, data, args)
     }
-
-    if (rs.isDefined) {
-      rs.map { r =>
-        if (resultToArrayByLine) r.split("\n").map(_.trim).mkString("[\"", "\",\"", "\"]") else r.trim
-      }
-    } else {
-      None
-    }
   }
 
-  private def executeScriptForOnline(files: Seq[Seq[String]], env: Map[String, String], data: Option[String], args: Option[JsValue]): Option[String] = {
+  private def executeScriptForOnline(files: Seq[Seq[String]], env: Map[String, String], data: Option[String], args: Option[JsValue]): String = {
     val url = getUrlByPath(files(0))
     import sys.process._
     val executor: Seq[String] = executorChoice(url, ScriptExecutorMode.ONLINE)
@@ -95,46 +87,44 @@ object ScriptExecute {
       args match {
         case Some(args) =>
           val argsSeq: Seq[String] = Seq("")
-          Some(Seq("curl", "-sk", url) #| (executor ++ argsSeq) !!)
+          Seq("curl", "-sk", url) #| (executor ++ argsSeq) !!
         case None =>
-          Some(Seq("curl", "-sk", url) #| executor !!)
+          Seq("curl", "-sk", url) #| executor !!
       }
     } else {
       executeScriptForDown(files, env, data, args)
     }
   }
 
-  private def executeScriptForDown(files: Seq[Seq[String]], env: Map[String, String], dataOpt: Option[String], argsOpt: Option[JsValue]): Option[String] = {
+  private def executeScriptForDown(files: Seq[Seq[String]], env: Map[String, String], dataOpt: Option[String], argsOpt: Option[JsValue]): String = {
     import sys.process._
 
     val mainFile = files(0).last
 
     var executor: Seq[String] = executorChoice(mainFile, ScriptExecutorMode.DOWN)
-    val (workDirName, deleteWorkDirFun) = createWorkDirAndDeleteAfterExecute()
+    val (actionDirName, deleteWorkDirFun) = createWorkDirAndDeleteAfterExecute()
 
-    files.foreach(downScript(_, workDirName))
+    files.foreach(downScript(_, actionDirName))
 
     executor = executor :+ mainFile
 
     if (dataOpt.isDefined) {
-      wirteFile(dataOpt.get, workDirName, "data.json")
+      wirteFile(dataOpt.get, actionDirName, "data.json")
       executor = executor :+ "data.json"
     }
 
     if (argsOpt.isDefined) {
-      wirteFile(argsOpt.get.toString(), workDirName, "args.json")
+      wirteFile(argsOpt.get.toString(), actionDirName, "args.json")
       executor = executor :+ "args.json"
     }
 
-    val result: Option[String] = try {
-      Some(Process(executor, new java.io.File(workDirName), env.toSeq: _*).!!)
+    try {
+      Process(executor, new java.io.File(actionDirName), env.toSeq: _*).!!
     } catch {
       case ex: Exception =>
-        println(ex.getMessage)
-        None
-    }
-    deleteWorkDirFun()
-    result
+        throw new Exception(s"command execute error: ${ex.getMessage}")
+    } finally
+      deleteWorkDirFun()
   }
 
 }

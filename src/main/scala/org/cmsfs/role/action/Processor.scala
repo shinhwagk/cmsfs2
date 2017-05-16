@@ -9,7 +9,7 @@ object Processor {
 
   case class ProcessorConfig(result: String, process: ActionConfig, env: Map[String, String])
 
-  def executeProcess(config: ProcessorConfig): Option[String] = {
+  def executeProcess(config: ProcessorConfig): String = {
     val files: Seq[Seq[String]] = config.process.files
     val result: String = config.result
     val args: Option[JsValue] = config.process.confArgsOpt

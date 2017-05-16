@@ -1,0 +1,27 @@
+apply plugin: 'scala'
+apply plugin: 'application'
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    compile group: 'org.scala-lang', name: 'scala-library', version: gradle.scala.version
+    compile name: 'ojdbc8'
+    compile group: 'com.typesafe.akka', name: 'akka-cluster_2.12', version: gradle.akka.version
+    compile group: 'com.typesafe.akka', name: 'akka-slf4j_2.12', version: gradle.akka.version
+    compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
+}
+
+tasks.withType(ScalaCompile) {
+    configure(scalaCompileOptions.forkOptions) {
+        memoryMaximumSize = '1g'
+        jvmArgs = ['-XX:MaxPermSize=512m']
+    }
+    scalaCompileOptions.with {
+        force = true
+    }
+}

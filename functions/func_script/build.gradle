@@ -1,0 +1,24 @@
+apply plugin: 'scala'
+apply plugin: 'application'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.scala-lang', name: 'scala-library', version: gradle.scala.version
+    compile group: 'com.typesafe.akka', name: 'akka-cluster_2.12', version: gradle.akka.version
+    compile group: 'com.typesafe.akka', name: 'akka-slf4j_2.12', version: gradle.akka.version
+    compile group: 'com.typesafe.play', name: 'play-json_2.12', version: '2.6.0-M7'
+
+}
+
+tasks.withType(ScalaCompile) {
+    configure(scalaCompileOptions.forkOptions) {
+        memoryMaximumSize = '1g'
+        jvmArgs = ['-XX:MaxPermSize=512m']
+    }
+    scalaCompileOptions.with {
+        force = true
+    }
+}

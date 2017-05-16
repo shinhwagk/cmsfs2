@@ -5,6 +5,6 @@ import play.api.libs.json.JsValue
 
 object ActionMessages {
 
-  case class WorkerJob(collectResult: String, action: ConfTaskAction, env: Map[String, String])
+  case class WorkerJob(collectResult: String, action: Seq[ConfTaskAction], env: Map[String, String])
 
 }

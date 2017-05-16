@@ -10,7 +10,7 @@ import org.cmsfs.config.db.table.ConfBootstrap
 import org.cmsfs.role.ServiceStart
 import org.cmsfs.role.api.Api
 import org.cmsfs.role.bootstrap.BootstrapService.CollectScheduler
-import org.cmsfs.role.collect.{CollectorMasterService, CollectorServiceMessage}
+import org.cmsfs.role.trigger.collect.{CollectorMasterService, CollectorServiceMessage}
 import org.quartz.CronExpression
 
 import scala.concurrent.duration._

@@ -1,0 +1,22 @@
+apply plugin: 'scala'
+apply plugin: 'application'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.scala-lang:scala-library:2.12.2"
+    compile group: 'com.typesafe.slick', name: 'slick_2.12', version: '3.2.0'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
+}
+
+tasks.withType(ScalaCompile) {
+    configure(scalaCompileOptions.forkOptions) {
+        memoryMaximumSize = '1g'
+        jvmArgs = ['-XX:MaxPermSize=512m']
+    }
+    scalaCompileOptions.with {
+        force = true
+    }
+}
