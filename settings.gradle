@@ -1,10 +1,10 @@
 include 'core:database'
+include 'core:controller'
 
 include 'functions'
 include 'functions:func_script'
 include 'functions:func_restful'
 include 'functions:func_jdbc'
-
 
 gradle.ext {
     scala = [version: '2.12.2']
