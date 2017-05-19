@@ -8,7 +8,10 @@ abstract class CollectorWorkerCore(collectorMasterActorRef: ActorRef) extends Ac
 
   def toProcess(result: String, processes: Seq[ConfTaskAction], env: Map[String, String]): Unit = {
     processes.foreach { action =>
+      log.info(s"collect result: ${result.substring(10)}")
+      log.info("send collect result to action start.")
       collectorMasterActorRef ! ActionMessages.WorkerJob(result, action, env)
+      log.info("send collect result to action end.")
     }
   }
 

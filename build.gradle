@@ -22,8 +22,7 @@ def akkaVersion = '2.5.1'
 
 dependencies {
     compile name: 'ojdbc8'
-//    compile "org.scala-lang:scala-library:${gradle.scala.version}"
-    compile "org.scala-lang:scala-library:2.12.2"
+    compile group: 'org.scala-lang', name: 'scala-library', version: '2.12.2'
     compile group: 'com.typesafe.akka', name: 'akka-cluster_2.12', version: akkaVersion
     compile group: 'com.typesafe.akka', name: 'akka-slf4j_2.12', version: akkaVersion
 

@@ -42,7 +42,7 @@ class ActionService extends Actor with ActorLogging {
     val processResult: Future[Option[String]] = for {
       coreProcess <- QueryConfig.getCoreProcessById(action.id)
     } yield {
-      val processConfig = ActionConfig(coreProcess.files, None)
+      val processConfig = ActionConfig(coreProcess.files, action.args)
       val processorConfig = ProcessorConfig(result, processConfig, env)
       Processor.executeProcess(processorConfig)
     }

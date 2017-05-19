@@ -30,7 +30,6 @@ trait SshCollectWorkerAction {
       }
     } catch {
       case ex: Exception => {
-        println(ex.getMessage + s" host :${host}" + " collectionAction");
         logger.error(ex.getMessage + s" host :${host}" + " collectionAction");
         None
       }
@@ -46,7 +45,8 @@ trait SshCollectWorkerAction {
 
     val channelExec: ChannelExec = session.openChannel("exec").asInstanceOf[ChannelExec]
     val in = channelExec.getInputStream();
-    channelExec.setCommand(s"curl -sk ${scriptUrl} | sh");
+    val content = ScriptExecute.getUrlContentByPath(scriptUrl)
+    channelExec.setCommand(content);
     channelExec.connect();
 
     val reader = new BufferedReader(new InputStreamReader(in));

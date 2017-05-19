@@ -1,5 +1,6 @@
 package org.cmsfs.role.collect
 
+import akka.event.LoggingAdapter
 import org.cmsfs.common.ScriptExecute
 import org.cmsfs.config.db.table.{CoreConnectJdbc, CoreConnectSsh}
 import org.cmsfs.role.collect.jdbc.{CollectingMysql, CollectingOracle}
@@ -47,7 +48,7 @@ object Collector extends
     category.toLowerCase match {
       case "oracle" => s"jdbc:oracle:thin:@//${ip}:${port}/${service}"
       case "mysql" => s"jdbc:mysql://${ip}:${port}/${service}?useSSL=false"
-      case _=> throw new Exception(s"jdbc database type ${category} no Implement.")
+      case _ => throw new Exception(s"jdbc database type ${category} no Implement.")
     }
   }
 

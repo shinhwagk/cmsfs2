@@ -55,6 +55,7 @@ class BootstrapService extends Actor with ActorLogging {
     implicit val cDate = new Date()
     (apiActor ? Api.getAllValidCollect(cDate)).mapTo[Seq[ConfBootstrap]] foreach { tasks =>
       tasks foreach { task =>
+        log.info(s"send task ${task.bootstrapId}")
         collectServiceActor ! CollectorServiceMessage.WorkerJob(task.schema, cDate.toInstant.toString)
       }
     }

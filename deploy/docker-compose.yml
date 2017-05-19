@@ -1,0 +1,96 @@
+version: "2.1"
+
+services:
+  cmsfs:
+    image: cmsfs:latest
+    container_name: cmsfs_cmsfs
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /root/.ssh/id_rsa:/root/.ssh/id_rsa
+    networks:
+      - cmsfs
+    logging: 
+      driver: "json-file"
+      options: 
+        max-file: "3"
+        max-size: "10m"
+
+  nginx:
+    image: nginx
+    container_name: cmsfs_nginx
+    ports:
+      - 8080:80
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./nginx/files:/usr/share/nginx/html/files
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      cmsfs:
+        aliases:
+          - nginx.cmsfs.org
+
+  mysql:
+    image: mysql
+    container_name: cmsfs_mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456aA+
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - /etc/localtime:/etc/localtime
+    networks:
+      cmsfs:
+        aliases:
+          - mysql.cmsfs.org
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "ss -lt | grep mysql"]
+      interval: 3s
+      timeout: 2s
+      retries: 10
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.4.0
+    container_name: cmsfs_elasticsearch
+    networks:
+      cmsfs:
+        aliases:
+          - elasticsearch.cmsfs.org
+    environment:
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+    mem_limit: 3g
+    volumes:
+      - ./elasticsearch/esdata:/usr/share/elasticsearch/data
+      - /etc/localtime:/etc/localtime
+    ports:
+      - "9200:9200"
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "3"
+        max-size: "10m"
+
+  grafana:
+    image: grafana/grafana
+    container_name: cmsfs_grafana
+    networks:
+      - cmsfs
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./grafana/data:/var/lib/grafana
+      # - ./grafana/config:/etc/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=123456aA+
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "3"
+        max-size: "10m"
+
+networks:
+   cmsfs:
+    driver: bridge

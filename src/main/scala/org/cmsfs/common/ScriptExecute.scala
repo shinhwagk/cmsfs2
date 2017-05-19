@@ -25,6 +25,10 @@ object ScriptExecute {
     Source.fromURL(getUrlByPath(path), "UTF-8").mkString.trim
   }
 
+  def getUrlContentByPath(url:String): String = {
+    Source.fromURL(url, "UTF-8").mkString.trim
+  }
+
   private def createWorkDirAndDeleteAfterExecute(): (String, () => Unit) = {
     val dirName = s"workspace/${ThreadLocalRandom.current.nextLong(100000000).toString}"
     val dir = new File(dirName)
@@ -56,7 +60,7 @@ object ScriptExecute {
     val name = mainFile.split("\\.").last
     if (ScriptExecutorMode.DOWN == executeMode) {
       name match {
-        case "py" => Seq("python")
+        case "py" => Seq("python3")
         case "sh" => Seq("sh")
         case "ps1" => Seq("powershell")
         case _ => throw new Exception(s"actuator unknown: ${name}")

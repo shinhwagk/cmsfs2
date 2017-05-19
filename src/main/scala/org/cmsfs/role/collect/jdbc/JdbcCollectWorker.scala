@@ -22,22 +22,20 @@ class JdbcCollectWorker(collectorMasterActorRef: ActorRef) extends CollectorWork
               ("conn-ip" -> conn.ip) +
               ("conn-service" -> conn.service) +
               ("conn-jdbc-category" -> conn.category)
-
-          val resultOpt: Option[String] = conn.category.toLowerCase() match {
-            case "oracle" =>
-              val collectorConfig: Collector.CollectorConfig = Collector.JdbcOracleCollectorConfig(conn, collectConfig, env)
-              Collector.executeCollect(collectorConfig)()
-            case "mysql" =>
-              val collectorConfig: Collector.CollectorConfig = Collector.JdbcMysqlCollectorConfig(conn, collectConfig, env)
-              Collector.executeCollect(collectorConfig)()
+          val collectorConfig = conn.category.toLowerCase() match {
+            case "oracle" => Collector.JdbcOracleCollectorConfig(conn, collectConfig, env)
+            case "mysql" => Collector.JdbcMysqlCollectorConfig(conn, collectConfig, env)
           }
-
-          toProcess(resultOpt, confTaskSchema.actions, newEnv)
+          val resultOpt: Option[String] = Collector.executeCollect(collectorConfig)()
+          try {
+            toProcess(resultOpt, confTaskSchema.actions, newEnv)
+          } catch {
+            case ex: Exception => log.error(s"jdbc exec error: ${ex.getMessage}")
+          }
         }
         case Failure(ex) => log.error(ex.getMessage)
       }
   }
-
 }
 
 object JdbcCollectWorker {
